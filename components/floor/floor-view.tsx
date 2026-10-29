@@ -73,7 +73,6 @@ export function FloorView({ occurrences, dates, today, coaches, sites }: { occur
 			filterOccurrences(occurrences, { site: filters.site, discipline: filters.discipline, class: classFilter, maxIntensity: filters.max, coach: filters.coach }, (slug) => coaches.find((c) => c.slug === slug)?.id ?? null).filter((o) =>
 				now ? Date.parse(o.start) > now.getTime() : true,
 			),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[occurrences, filters.site, filters.discipline, filters.max, filters.coach, classFilter, coaches, now],
 	);
 	const dayCounts = useMemo(() => dates.map((date) => ({ date, open: filtered.filter((o) => o.localDate === date && o.status !== 'full').length })), [dates, filtered]);

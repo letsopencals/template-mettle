@@ -17,7 +17,7 @@ const PLATE_SHAPE: Record<Plate, { h: number; w: number }> = {
 const MAX_DRAWN = 8;
 
 function Sleeve({ plates, side, size }: { plates: BarPlate[]; side: 'left' | 'right'; size: 'sm' | 'lg' }) {
-	const scale = size === 'lg' ? 1.25 : 0.8;
+	const scale = size === 'lg' ? 2.1 : 1.15;
 	const shown = plates.slice(0, MAX_DRAWN);
 	return (
 		<div className={clsx('flex h-full items-center gap-[2px]', side === 'left' ? 'flex-row-reverse' : 'flex-row')}>

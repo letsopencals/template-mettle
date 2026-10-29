@@ -63,7 +63,7 @@ export function Header({ upcoming }: { upcoming: NextUp[] }) {
 									key={n.href}
 									href={n.href}
 									aria-current={active ? 'page' : undefined}
-									className={clsx('relative px-3 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.08em] transition-colors', active ? 'text-chalk' : 'text-chalk/65 hover:text-chalk')}
+									className={clsx('relative px-2.5 py-2 text-[0.8rem] font-semibold uppercase tracking-[0.08em] transition-colors', active ? 'text-chalk' : 'text-chalk/65 hover:text-chalk')}
 								>
 									{n.label}
 									{active ? <span className="absolute inset-x-3 -bottom-[13px] h-[3px] bg-plate-red" /> : null}
@@ -73,7 +73,7 @@ export function Header({ upcoming }: { upcoming: NextUp[] }) {
 					</nav>
 					<div className="ml-auto flex items-center gap-2">
 						<NextOnFloor upcoming={upcoming} className="hidden xl:flex" />
-						<Link href={signedIn ? '/account' : '/login'} className="hidden h-10 items-center px-3 text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-chalk/75 hover:text-chalk sm:flex">
+						<Link href={signedIn ? '/account' : '/login'} className="hidden h-10 items-center whitespace-nowrap px-2 text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-chalk/75 hover:text-chalk sm:flex">
 							{signedIn ? 'Log' : 'Sign in'}
 						</Link>
 						<BarButton />

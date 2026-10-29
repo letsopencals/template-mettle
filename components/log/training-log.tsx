@@ -7,7 +7,7 @@ import { clsx } from 'clsx';
 import { useSession } from 'next-auth/react';
 import type { AppointmentListItemResponse } from '@opencals/storefront-sdk';
 import { fetcher } from '@/lib/fetcher';
-import { toBookingView } from '@/lib/booking-view';
+import { toBookingView, type BookingView } from '@/lib/booking-view';
 import { byWeek, plateCounts, splitLog, weekStreak } from '@/lib/log';
 import { dayLabel, localDateParts, minutesLabel, timeLabel } from '@/lib/when';
 import { useNow } from '@/hooks/use-now';
@@ -27,15 +27,18 @@ export const BOOKINGS_KEY = '/api/account/appointments?take=100&orderBy=from&ord
 export function TrainingLog() {
 	const { data: session } = useSession();
 	const { data, error, isLoading, mutate } = useSWR<{ data: AppointmentListItemResponse[] }>(BOOKINGS_KEY, fetcher, { revalidateOnFocus: false });
-	const now = useNow(60_000);
 	const views = useMemo(() => (data?.data ?? []).map((a) => toBookingView(a as Parameters<typeof toBookingView>[0])), [data]);
+	if (error && !data) return <div className="container-x py-10"><AccountError what="your log" onRetry={() => void mutate()} /></div>;
+	return <TrainingLogView views={views} loading={isLoading} name={session?.customer?.firstName ?? null} />;
+}
+
+/** The log itself, from booking views (also used by the preview screens). */
+export function TrainingLogView({ views, loading, name }: { views: BookingView[]; loading: boolean; name: string | null }) {
+	const now = useNow(60_000);
 	const split = useMemo(() => (now ? splitLog(views, now.getTime()) : null), [views, now]);
 	const counts = useMemo(() => (split ? plateCounts(split.done) : []), [split]);
 	const weeks = useMemo(() => (split ? byWeek([...split.upcoming].reverse().concat(split.done)) : []), [split]);
 	const streak = split && now ? weekStreak(split.done, now.getTime()) : 0;
-	const name = session?.customer?.firstName ?? null;
-
-	if (error && !data) return <div className="container-x py-10"><AccountError what="your log" onRetry={() => void mutate()} /></div>;
 
 	return (
 		<>
@@ -68,7 +71,7 @@ export function TrainingLog() {
 			</section>
 
 			<section className="container-x py-12">
-				{isLoading || !split ? (
+				{loading || !split ? (
 					<AccountLoading label="Loading your log" />
 				) : (
 					<div className="grid gap-12 lg:grid-cols-12">
@@ -128,7 +131,7 @@ export function TrainingLog() {
 													const upcoming = now ? v.start > now.getTime() : false;
 													return (
 														<tr key={v.id} className="h-11">
-															<td className="mono w-32 whitespace-nowrap text-muted">
+															<td className="mono w-40 whitespace-nowrap pr-3 text-muted">
 																{dayLabel(v.start)} {timeLabel(v.start)}
 															</td>
 															<td>

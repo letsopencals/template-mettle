@@ -40,7 +40,7 @@ export function Bib({ orderName, name, views, className }: { orderName: string |
 				</div>
 				<div className="flex h-5" aria-hidden>
 					{(views.length ? views : [null]).map((v, i) => (
-						<span key={v?.id ?? i} className="flex-1 border-r border-[#F7F7F2] last:border-r-0" style={{ backgroundColor: v ? siteConfig.plates[v.plate].hex : '#8A9399' }} />
+						<span key={v?.id ?? i} className={clsx('flex-1 border-r border-[#F7F7F2] last:border-r-0', v?.plate === 'white' && 'shadow-[inset_0_0_0_2px_#121212]')} style={{ backgroundColor: v ? siteConfig.plates[v.plate].hex : '#8A9399' }} />
 					))}
 				</div>
 				<div className="flex items-center justify-between gap-4 border-t-2 border-dashed border-ink/25 px-8 py-3">

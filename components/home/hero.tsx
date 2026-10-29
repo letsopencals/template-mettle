@@ -28,7 +28,7 @@ export function Hero({ next, coachNames }: { next: Occurrence[]; coachNames: Rec
 						<br />
 						with
 						<br />
-						<span className="text-plate-red">mettle.</span>
+						<span className="text-plate-yellow">mettle.</span>
 					</h1>
 					<p className="mt-6 max-w-xl text-lg text-chalk/80">
 						Barbell, boxing, conditioning and the slow stuff that keeps you training. Coaches who know your name, a contrast suite where the boiler room used to be, and a lab to prove it&rsquo;s working.

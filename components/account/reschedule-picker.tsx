@@ -58,7 +58,7 @@ export function ReschedulePicker({ appt, onMove, pending }: { appt: Appt; onMove
 		const mine: FreeRange = { start: own, end: Date.parse(appt.to), attendees: 0, maxAttendees: places, staffMemberIds: appt.staffMemberId ? [appt.staffMemberId] : [] };
 		const step = serviceMeta(serviceKeyForSlug(appt.product?.slug))?.startStep ?? (lenMin >= 60 ? 30 : 15);
 		return startsFrom([...ranges, mine], { durationMin: lenMin, stepMin: step, now: now.getTime(), places }).filter((s) => s.start !== own);
-	}, [ranges, now, isClass, lenMin, places, own, appt.staffMemberId, appt.to]);
+	}, [ranges, now, isClass, lenMin, places, own, appt.staffMemberId, appt.to, appt.product?.slug]);
 
 	const byDay = useMemo(() => startsByDay(starts), [starts]);
 	const today = now ? localParts(now.getTime()).date : null;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { clsx } from 'clsx';
 import type { Occurrence } from '@/lib/timetable';
 import type { RackStart } from '@/lib/rack';
