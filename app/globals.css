@@ -1,0 +1,284 @@
+@import 'tailwindcss';
+
+/*
+ * METTLE: "Calibrated". See DESIGN.md for the contract.
+ * Rubber floor and chalk. The calibrated plate colours are the discipline
+ * language and nothing else; status (places left, Full) uses the LED colours.
+ */
+@theme {
+	/* Surfaces */
+	--color-rubber: #121212;
+	--color-rubber-2: #1c1c1b;
+	--color-rubber-3: #262624;
+	--color-rubber-line: #2e2e2c;
+	--color-chalk: #f2efe8;
+	--color-chalk-2: #e6e1d6;
+	--color-chalk-3: #fbfaf6;
+	--color-chalk-line: #d9d4c8;
+
+	/* Ink */
+	--color-ink: #121212;
+	--color-ink-2: #3a3936;
+	--color-muted: #6b6862;
+	--color-dim: #9a968e;
+	--color-steel: #8a9399;
+
+	/* Plates (category only) */
+	--color-plate-red: #d7262e;
+	--color-plate-blue: #1f5fbf;
+	--color-plate-yellow: #f2c230;
+	--color-plate-green: #1e9e5a;
+	--color-plate-white: #f7f7f2;
+	--color-plate-black: #0a0a0a;
+	--color-plate-steel: #8a9399;
+
+	/* Interval-timer LEDs (status only) */
+	--color-led-red: #ff3b2f;
+	--color-led-green: #38e07b;
+	--color-led-amber: #ffb020;
+
+	--font-display: var(--font-shoulders), 'Big Shoulders Display', Impact, sans-serif;
+	--font-sans: var(--font-albert), 'Albert Sans', system-ui, sans-serif;
+	--font-mono: var(--font-chivo-mono), 'Chivo Mono', ui-monospace, monospace;
+
+	--radius-xs: 2px;
+
+	--ease-rack: cubic-bezier(0.2, 0.9, 0.3, 1.2);
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------ Base */
+
+html {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	scroll-padding-top: 5rem;
+}
+
+body {
+	background: var(--color-chalk);
+	color: var(--color-ink);
+	font-family: var(--font-sans);
+	font-feature-settings: 'ss01', 'tnum';
+}
+
+::selection {
+	background: var(--color-plate-yellow);
+	color: var(--color-ink);
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-plate-blue);
+	outline-offset: 2px;
+}
+
+.slab-rubber :focus-visible {
+	outline-color: var(--color-plate-yellow);
+}
+
+/* ------------------------------------------------------------------ Type */
+
+.display {
+	font-family: var(--font-display);
+	font-weight: 800;
+	text-transform: uppercase;
+	line-height: 0.86;
+	letter-spacing: 0.005em;
+}
+
+.display-xl {
+	font-size: clamp(3.6rem, 11vw, 10.5rem);
+}
+.display-lg {
+	font-size: clamp(2.8rem, 6.4vw, 6rem);
+}
+.display-md {
+	font-size: clamp(2.1rem, 4vw, 3.6rem);
+}
+.display-sm {
+	font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+}
+
+.mono {
+	font-family: var(--font-mono);
+	font-feature-settings: 'tnum', 'zero';
+}
+
+.index-label {
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------------ Slabs */
+
+.slab-rubber {
+	background: var(--color-rubber);
+	color: var(--color-chalk);
+}
+
+/* Rubber flooring: a faint speckle, drawn once as a data-URI noise tile. */
+.rubber-texture {
+	background-color: var(--color-rubber);
+	background-image: radial-gradient(rgba(242, 239, 232, 0.05) 0.7px, transparent 0.8px), radial-gradient(rgba(242, 239, 232, 0.035) 0.7px, transparent 0.8px);
+	background-size: 7px 7px, 11px 11px;
+	background-position: 0 0, 3px 5px;
+}
+
+.slab-chalk {
+	background: var(--color-chalk);
+	color: var(--color-ink);
+}
+
+/* Chalk dust: a few soft smudges on light slabs. */
+.chalk-texture {
+	background-color: var(--color-chalk);
+	background-image: radial-gradient(ellipse 40% 30% at 12% 18%, rgba(255, 255, 255, 0.7), transparent 70%),
+		radial-gradient(ellipse 35% 25% at 88% 72%, rgba(255, 255, 255, 0.55), transparent 70%);
+}
+
+.container-x {
+	width: 100%;
+	max-width: 88rem;
+	margin-inline: auto;
+	padding-inline: 1rem;
+}
+@media (min-width: 768px) {
+	.container-x {
+		padding-inline: 2rem;
+	}
+}
+
+/* Knurled bar texture (the shaft of the barbell, hairline rules). */
+.knurl {
+	background-image: repeating-linear-gradient(60deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 4px), repeating-linear-gradient(-60deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 4px);
+}
+
+/* Full: hatched black. */
+.hatch-full {
+	background-image: repeating-linear-gradient(135deg, rgba(242, 239, 232, 0.13) 0 2px, transparent 2px 7px);
+}
+.hatch-full-ink {
+	background-image: repeating-linear-gradient(135deg, rgba(18, 18, 18, 0.16) 0 2px, transparent 2px 7px);
+}
+
+/* Ruled log paper (account). */
+.log-ruled {
+	background-image: linear-gradient(to bottom, transparent calc(100% - 1px), var(--color-chalk-line) calc(100% - 1px));
+	background-size: 100% 2.75rem;
+}
+
+/* ------------------------------------------------------------------ LED */
+
+.led {
+	font-family: var(--font-mono);
+	font-feature-settings: 'tnum', 'zero';
+	text-shadow: 0 0 8px currentColor, 0 0 1px currentColor;
+}
+.led-colon {
+	animation: led-tick 1s steps(1, end) infinite;
+}
+@keyframes led-tick {
+	50% {
+		opacity: 0.15;
+	}
+}
+
+/* ------------------------------------------------------------------ Motion */
+
+@keyframes rack-in {
+	from {
+		transform: translateX(120%);
+		opacity: 0;
+	}
+	to {
+		transform: none;
+		opacity: 1;
+	}
+}
+.rack-in {
+	animation: rack-in 0.28s var(--ease-rack) both;
+}
+
+@keyframes meter-fill {
+	from {
+		transform: scaleX(0);
+	}
+}
+.meter-fill {
+	transform-origin: left center;
+	animation: meter-fill 0.7s var(--ease-out) both;
+}
+
+@keyframes clock-sweep {
+	from {
+		transform: scaleX(0);
+	}
+}
+.clock-sweep {
+	transform-origin: left center;
+	animation: clock-sweep 1.1s var(--ease-out) both;
+}
+
+@keyframes sheet-up {
+	from {
+		transform: translateY(100%);
+	}
+}
+.sheet-up {
+	animation: sheet-up 0.3s var(--ease-out) both;
+}
+
+@keyframes drawer-in {
+	from {
+		transform: translateX(100%);
+	}
+}
+.drawer-in {
+	animation: drawer-in 0.3s var(--ease-out) both;
+}
+
+@keyframes flash {
+	0% {
+		background-color: var(--color-plate-yellow);
+	}
+}
+.flash {
+	animation: flash 0.9s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+	}
+}
+
+/* ------------------------------------------------------------------ Misc */
+
+.no-scrollbar {
+	scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
+.image-placeholder {
+	background: var(--color-rubber-2);
+}
+
+@keyframes rack-in-left {
+	from {
+		transform: translateX(-120%);
+		opacity: 0;
+	}
+	to {
+		transform: none;
+		opacity: 1;
+	}
+}
