@@ -68,7 +68,7 @@ function QuestionField({ q, value, onChange }: { q: CheckoutQuestion; value: str
 		);
 	}
 	if (q.type === 'file-upload' || q.type === 'rating') return null;
-	const options = (t?.options as string[] | null | undefined) ?? null;
+	const options = t?.options ?? null;
 	return (
 		<div>
 			<FieldLabel htmlFor={id} required={q.required}>
@@ -119,7 +119,7 @@ export function CheckoutView() {
 	const c = useCheckout();
 	const { cart, removeItem } = useCart();
 	const { currency } = useSettings();
-	const [method, setMethod] = useState<string | undefined>(undefined);
+	const [method, setMethod] = useState<CustomerProviderCatalogItem['name'] | undefined>(undefined);
 	const items = useMemo(() => c.items.slice().sort((a, b) => (a.appointment?.from ?? '').localeCompare(b.appointment?.from ?? '')), [c.items]);
 	const plates = useMemo(() => barPlates(items), [items]);
 	const progress = useMemo(() => barProgress(items), [items]);
@@ -218,7 +218,7 @@ export function CheckoutView() {
 								</Button>
 							</div>
 						) : c.step === 'payment' && c.paymentData ? (
-							c.paymentData.clientSecret && checkoutModeOf(c.selectedProvider ?? '', c.providers) === 'internal' ? (
+							c.paymentData.clientSecret && checkoutModeOf(c.selectedProvider, c.providers) === 'internal' ? (
 								<StripePayment
 									clientSecret={c.paymentData.clientSecret}
 									stripeAccountId={c.paymentData.stripeAccountId}

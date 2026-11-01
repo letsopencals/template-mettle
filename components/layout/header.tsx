@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { clsx } from 'clsx';
-import type { CartItem } from '@opencals/storefront-sdk';
 import { useCart } from '@/contexts/cart-context';
 import { useBarUi } from '@/contexts/bar-ui-context';
 import { Logo } from '@/components/brand/logo';
@@ -20,7 +19,7 @@ import { siteConfig } from '@/lib/site-config';
 function BarButton() {
 	const { cart } = useCart();
 	const { setOpen } = useBarUi();
-	const plates = useMemo(() => barPlates((cart?.items ?? []) as CartItem[]), [cart?.items]);
+	const plates = useMemo(() => barPlates(cart?.items), [cart?.items]);
 	return (
 		<button
 			type="button"

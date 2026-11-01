@@ -1,3 +1,4 @@
+import type { CartItem, CartItemAppointment, CartItemProduct } from '@opencals/storefront-sdk';
 import { disciplineForSlug } from '@/lib/booking-meta';
 import { plateFor, siteConfig, type Plate } from '@/lib/site-config';
 
@@ -8,11 +9,9 @@ import { plateFor, siteConfig, type Plate } from '@/lib/site-config';
  * the "A$40 to Loaded" progress copy.
  */
 
-interface CartItemLike {
-	id: string;
-	originalSubtotal: number;
-	appointment?: { from?: string; product?: { slug?: string | null; title?: string | null } | null } | null;
-}
+type CartItemLike = Pick<CartItem, 'id' | 'originalSubtotal'> & {
+	appointment?: (Partial<Pick<CartItemAppointment, 'from'>> & { product?: Partial<Pick<CartItemProduct, 'slug' | 'title'>> | null }) | null;
+};
 
 export interface BarPlate {
 	/** Cart item id. */

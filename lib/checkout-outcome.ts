@@ -1,4 +1,9 @@
-import type { PaymentInstructions } from '@opencals/storefront-sdk';
+import type {
+	AppointmentStatusType,
+	CustomerProviderCatalogItem,
+	PaymentInstructions,
+	StorefrontAppointmentPendingReason,
+} from '@opencals/storefront-sdk';
 
 /**
  * What the checkout needs to know after a request: the API's error `code`
@@ -35,7 +40,8 @@ export async function checkoutError(res: Response, fallback: string): Promise<Ch
 	return new CheckoutRequestError(str(body.error) ?? fallback, res.status, str(body.code), str(body.orderId), str(body.paymentStatus));
 }
 
-export type CheckoutMode = 'internal' | 'redirect' | 'manual' | 'none';
+export type ProviderName = CustomerProviderCatalogItem['name'];
+export type CheckoutMode = CustomerProviderCatalogItem['checkoutMode'];
 
 /**
  * How a provider checks out. Card (`internal`) mounts Stripe, `redirect` leaves
@@ -43,7 +49,7 @@ export type CheckoutMode = 'internal' | 'redirect' | 'manual' | 'none';
  * place the order straight away. The backend can swap in
  * `no_payment_required` at start, so that name always means `none`.
  */
-export function checkoutModeOf(providerName: string, providers: ReadonlyArray<{ name: string; checkoutMode?: string | null }>): CheckoutMode {
+export function checkoutModeOf(providerName: ProviderName | null, providers: ReadonlyArray<Pick<CustomerProviderCatalogItem, 'name' | 'checkoutMode'>>): CheckoutMode {
 	if (providerName === 'no_payment_required') return 'none';
 	const mode = providers.find((p) => p.name === providerName)?.checkoutMode;
 	if (mode === 'internal' || mode === 'redirect' || mode === 'manual' || mode === 'none') return mode;
@@ -81,29 +87,28 @@ export function safeInvoiceUrl(url: string | null | undefined): string | null {
 
 // ── Booking status ──────────────────────────────────────────────────────────
 
-export type Awaiting = 'payment' | 'approval' | null;
+export type Awaiting = StorefrontAppointmentPendingReason | null;
 
 /**
  * Waiting only when the booking is `pending` AND the API says why. Right after
  * submit an automatically confirmed booking is briefly `pending` with no
  * reason while a background job confirms it: that one counts as confirmed.
  */
-export function awaitingOf(status: string | null | undefined, pendingReason: string | null | undefined): Awaiting {
+export function awaitingOf(status: AppointmentStatusType | null | undefined, pendingReason: StorefrontAppointmentPendingReason | null | undefined): Awaiting {
 	if (status !== 'pending' || !pendingReason) return null;
-	if (pendingReason === 'awaiting_payment') return 'payment';
-	if (pendingReason === 'awaiting_approval') return 'approval';
+	if (pendingReason === 'awaiting_payment' || pendingReason === 'awaiting_approval') return pendingReason;
 	return null;
 }
 
 /** The wait to headline for an order: payment first (the customer can act on it), then the club's approval. */
 export function orderAwaiting(list: ReadonlyArray<Awaiting>): Awaiting {
-	if (list.includes('payment')) return 'payment';
-	if (list.includes('approval')) return 'approval';
+	if (list.includes('awaiting_payment')) return 'awaiting_payment';
+	if (list.includes('awaiting_approval')) return 'awaiting_approval';
 	return null;
 }
 
 /** Short mono tag for a waiting booking in the log and on its detail page. */
-export const AWAITING_TAG: Record<'payment' | 'approval', string> = {
-	payment: 'AWAITING PAYMENT',
-	approval: 'AWAITING CONFIRMATION',
+export const AWAITING_TAG: Record<StorefrontAppointmentPendingReason, string> = {
+	awaiting_payment: 'AWAITING PAYMENT',
+	awaiting_approval: 'AWAITING CONFIRMATION',
 };

@@ -28,7 +28,7 @@ export function OrderDetailView({ id }: { id: string }) {
 			</p>
 			<ul className="mt-6 border-t-2 border-ink">
 				{o.lineItems.map((li) => {
-					const v = li.appointment ? toBookingView(li.appointment as Parameters<typeof toBookingView>[0]) : null;
+					const v = li.appointment ? toBookingView(li.appointment) : null;
 					return (
 						<li key={li.appointmentId ?? li.createdAt} className="flex items-center gap-3 border-b border-chalk-line py-3">
 							{v ? <Plate plate={v.plate} size="md" /> : null}

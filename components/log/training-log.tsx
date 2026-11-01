@@ -28,7 +28,7 @@ export const BOOKINGS_KEY = '/api/account/appointments?take=100&orderBy=from&ord
 export function TrainingLog() {
 	const { data: session } = useSession();
 	const { data, error, isLoading, mutate } = useSWR<{ data: AppointmentListItemResponse[] }>(BOOKINGS_KEY, fetcher, { revalidateOnFocus: false });
-	const views = useMemo(() => (data?.data ?? []).map((a) => toBookingView(a as Parameters<typeof toBookingView>[0])), [data]);
+	const views = useMemo(() => (data?.data ?? []).map((a) => toBookingView(a)), [data]);
 	if (error && !data) return <div className="container-x py-10"><AccountError what="your log" onRetry={() => void mutate()} /></div>;
 	return <TrainingLogView views={views} loading={isLoading} name={session?.customer?.firstName ?? null} />;
 }
@@ -143,7 +143,7 @@ export function TrainingLogView({ views, loading, name }: { views: BookingView[]
 																</Link>
 															</td>
 															<td className="hidden text-muted sm:table-cell">{v.coachFirstName ?? '—'}</td>
-															<td className={clsx('mono w-20 text-right text-xs', v.awaiting ? 'text-plate-red' : upcoming ? 'text-plate-blue' : 'text-plate-green')}>{v.awaiting ? (v.awaiting === 'payment' ? 'TO PAY' : 'TO CONFIRM') : upcoming ? 'NEXT' : 'DONE ✓'}</td>
+															<td className={clsx('mono w-20 text-right text-xs', v.awaiting ? 'text-plate-red' : upcoming ? 'text-plate-blue' : 'text-plate-green')}>{v.awaiting ? (v.awaiting === 'awaiting_payment' ? 'TO PAY' : 'TO CONFIRM') : upcoming ? 'NEXT' : 'DONE ✓'}</td>
 														</tr>
 													);
 												})}

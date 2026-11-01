@@ -7,11 +7,15 @@ import { useSession } from 'next-auth/react';
 import { useCart } from '@/contexts/cart-context';
 import { usePaymentProviders } from '@/hooks/use-payment-providers';
 import { useCheckoutQuestions } from '@/hooks/use-checkout-questions';
-import { checkoutError, checkoutModeOf, CheckoutRequestError, savePaymentInstructions } from '@/lib/checkout-outcome';
+import { checkoutError, checkoutModeOf, CheckoutRequestError, savePaymentInstructions, type ProviderName } from '@/lib/checkout-outcome';
 import type {
 	CustomerProviderCatalogItem,
 	CheckoutResponse,
 	CheckoutStartResponse,
+	CheckoutCustomer,
+	CheckoutQuestionAnswers,
+	SaveCustomerResponse,
+	StartCheckout,
 	SubmitCheckout,
 	CartItem,
 	CheckoutQuestionResponse as CheckoutQuestion,
@@ -47,7 +51,7 @@ interface CheckoutContextValue {
 
 	// Payment
 	providers: CustomerProviderCatalogItem[];
-	selectedProvider: string | null;
+	selectedProvider: ProviderName | null;
 	paymentData: CheckoutStartResponse | null;
 
 	// Cart info
@@ -62,7 +66,7 @@ interface CheckoutContextValue {
 	setError: (error: string | null) => void;
 	handleSaveCustomer: (e: React.FormEvent) => Promise<void>;
 	handleSaveAnswers: (e: React.FormEvent) => Promise<void>;
-	handleStartCheckout: (providerName: string) => Promise<void>;
+	handleStartCheckout: (providerName: ProviderName) => Promise<void>;
 	handleSubmitCheckout: (stripePaymentIntentId?: string) => Promise<void>;
 	extendCart: () => void;
 	restartFromFloor: () => void;
@@ -107,7 +111,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 	const [answers, setAnswers] = useState<Record<string, string>>({});
 
 	// Payment
-	const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+	const [selectedProvider, setSelectedProvider] = useState<ProviderName | null>(null);
 	const [paymentData, setPaymentData] = useState<CheckoutStartResponse | null>(null);
 
 	// Redirect if no cart — but only once CartProvider has read the stored cart id
@@ -135,7 +139,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 			setSubmitting(true);
 
 			try {
-				const customerPayload = customerId
+				const customerPayload: CheckoutCustomer = customerId
 					? { customer: { kind: 'existing', customerId } }
 					: { customer: { kind: 'new', email, firstName: firstName || undefined, lastName: lastName || undefined } };
 
@@ -150,7 +154,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 					throw new Error(data.error || 'Failed to save customer info');
 				}
 
-				const saveResult = await res.json();
+				const saveResult: SaveCustomerResponse = await res.json();
 				if (saveResult.customerId) {
 					setCustomerId(saveResult.customerId);
 				}
@@ -176,7 +180,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
 			try {
 				// The API wants the question text alongside each answer (kept as a historical record).
-				const answerArray = questions
+				const answerArray: CheckoutQuestionAnswers['answers'] = questions
 					.filter((q) => answers[q.id] !== undefined && answers[q.id] !== '')
 					.map((q) => ({
 						questionId: q.id,
@@ -302,13 +306,13 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
 	// Step 3: Start checkout with selected provider, then route on how that provider checks out.
 	const handleStartCheckout = useCallback(
-		async (providerName: string) => {
+		async (providerName: ProviderName) => {
 			setError(null);
 			setSubmitting(true);
 			setSelectedProvider(providerName);
 
 			try {
-				const startPayload: Record<string, unknown> = { provider: providerName };
+				const startPayload: StartCheckout = { provider: providerName };
 				if (customerId) {
 					startPayload.customer = { kind: 'existing', customerId };
 				}
@@ -319,7 +323,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
 				// Key off the RESPONSE provider: when nothing is collectible the backend swaps the requested one
 				// (e.g. Stripe) for "no payment required".
-				const provider: string = data.provider ?? providerName;
+				const provider: ProviderName = data.provider ?? providerName;
 				setSelectedProvider(provider);
 				const mode = checkoutModeOf(provider, providers);
 				if (mode === 'manual' || mode === 'none') {
@@ -347,7 +351,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 		router.push('/schedule');
 	}, [clearCart, router]);
 
-	const items = useMemo(() => (cart?.items ?? []) as CartItem[], [cart?.items]);
+	const items = useMemo<CartItem[]>(() => cart?.items ?? [], [cart?.items]);
 	const isExpired = timeRemaining !== null && timeRemaining <= 0;
 	const minutes = timeRemaining !== null ? Math.floor(timeRemaining / 60) : null;
 	const seconds = timeRemaining !== null ? timeRemaining % 60 : null;

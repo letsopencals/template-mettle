@@ -11,7 +11,7 @@ import { dayLabel, minutesLabel, timeLabel } from '@/lib/when';
 export function BarLine({ item, currency, onRemove, removing, tone = 'chalk' }: { item: CartItem; currency: string; onRemove?: () => void; removing?: boolean; tone?: 'chalk' | 'rubber' }) {
 	const appt = item.appointment;
 	if (!appt) return null;
-	const meta = getBookingMeta(appt as Parameters<typeof getBookingMeta>[0]);
+	const meta = getBookingMeta(appt);
 	const muted = tone === 'chalk' ? 'text-muted' : 'text-chalk/60';
 	return (
 		<li className={clsx('flex gap-3 py-3.5', removing && 'opacity-40')}>

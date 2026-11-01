@@ -11,9 +11,9 @@ import { toBookingView, type BookingView } from '@/lib/booking-view';
 import { buttonClasses } from '@/components/ui/button';
 import { BibPage } from '@/components/bib/bib-page';
 import { PaySlip } from '@/components/bib/pay-slip';
-import { awaitingOf, loadPaymentInstructions, orderAwaiting, type Awaiting } from '@/lib/checkout-outcome';
+import { awaitingOf, loadPaymentInstructions, orderAwaiting, type Awaiting, type ProviderName } from '@/lib/checkout-outcome';
 
-const MANUAL_PROVIDERS = new Set(['cash', 'bank_transfer', 'stripe_invoice']);
+const MANUAL_PROVIDERS = new Set<ProviderName>(['cash', 'bank_transfer', 'stripe_invoice']);
 
 function awaitingOfOrder(order: OrderDetailResponse | undefined): Awaiting {
 	return orderAwaiting((order?.lineItems ?? []).map((li) => (li.appointment ? awaitingOf(li.appointment.status, li.appointment.pendingReason) : null)));
@@ -22,15 +22,15 @@ function awaitingOfOrder(order: OrderDetailResponse | undefined): Awaiting {
 /** Unpaid order on a manual method whose pay slip is gone (a reload): point to the email instead. */
 function owesManually(order: OrderDetailResponse | undefined): boolean {
 	if (!order || order.isFullyPaid || order.paymentStatus === 'paid' || order.paymentStatus === 'voided') return false;
-	const provider: string | undefined = order.transactions?.[0]?.provider;
-	return provider ? MANUAL_PROVIDERS.has(provider) && provider !== 'cash' : awaitingOfOrder(order) === 'payment';
+	const provider = order.transactions?.[0]?.provider;
+	return provider ? MANUAL_PROVIDERS.has(provider) && provider !== 'cash' : awaitingOfOrder(order) === 'awaiting_payment';
 }
 
 function viewsOf(order: OrderDetailResponse | undefined): BookingView[] {
 	return (order?.lineItems ?? [])
 		.map((li) => li.appointment)
 		.filter((a) => a != null)
-		.map((a) => toBookingView(a as Parameters<typeof toBookingView>[0]))
+		.map((a) => toBookingView(a))
 		.sort((a, b) => a.start - b.start);
 }
 

@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import type { CartItem } from '@opencals/storefront-sdk';
 import { useCart } from '@/contexts/cart-context';
 import { useBarUi } from '@/contexts/bar-ui-context';
 import { useSettings } from '@/contexts/settings-context';
@@ -22,7 +21,7 @@ export function BarDrawer() {
 	const { cart, removeItem, timeRemaining, extendCart } = useCart();
 	const { currency } = useSettings();
 	const [removing, setRemoving] = useState<string | null>(null);
-	const items = useMemo(() => ((cart?.items ?? []) as CartItem[]).slice().sort((a, b) => (a.appointment?.from ?? '').localeCompare(b.appointment?.from ?? '')), [cart?.items]);
+	const items = useMemo(() => (cart?.items ?? []).slice().sort((a, b) => (a.appointment?.from ?? '').localeCompare(b.appointment?.from ?? '')), [cart?.items]);
 	const plates = useMemo(() => barPlates(items), [items]);
 	const progress = useMemo(() => barProgress(items), [items]);
 	const close = () => setOpen(false);

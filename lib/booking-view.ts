@@ -1,3 +1,4 @@
+import type { AppointmentStatusType, StorefrontAppointmentPendingReason } from '@opencals/storefront-sdk';
 import { getBookingMeta, type AppointmentLike, type BookingMeta } from '@/lib/booking-meta';
 import { awaitingOf, type Awaiting } from '@/lib/checkout-outcome';
 import { classMeta, serviceMeta, siteConfig, siteMeta } from '@/lib/site-config';
@@ -7,7 +8,7 @@ export interface BookingView extends BookingMeta {
 	id: string;
 	start: number;
 	end: number;
-	status: string;
+	status: AppointmentStatusType;
 	/** Set only when the booking is pending with a reason: waiting for payment or for the club to approve it. */
 	awaiting: Awaiting;
 	/** A pending session with no order behind it: a cart hold, not a booking. The log skips it. */
@@ -20,8 +21,8 @@ export interface BookingView extends BookingMeta {
 
 type Appt = AppointmentLike & {
 	id: string;
-	status?: string | null;
-	pendingReason?: string | null;
+	status?: AppointmentStatusType | null;
+	pendingReason?: StorefrontAppointmentPendingReason | null;
 	/** Present on list/detail appointments; absent on the ones embedded in an order. */
 	orderLineItem?: unknown;
 	location?: (AppointmentLike['location'] & { slug?: string | null }) | null;

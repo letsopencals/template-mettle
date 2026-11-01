@@ -1,7 +1,9 @@
 /**
  * Pure request guards shared by the `/api/*` routes and the login page.
- * No Next or SDK imports, so they're unit-tested in `guards.test.ts`.
+ * No runtime Next or SDK imports (SDK types only), so they're unit-tested in `guards.test.ts`.
  */
+
+import type { CreateAppointmentAddOn } from '@opencals/storefront-sdk';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -32,10 +34,10 @@ export function nonNegativeInt(v: unknown): number | null {
 }
 
 /** Add-on selections: string ids, integer quantity 1–20, unique ids, at most 30. */
-export function sanitizeAddOns(input: unknown): Array<{ addOnId: string; quantity?: number }> {
+export function sanitizeAddOns(input: unknown): CreateAppointmentAddOn[] {
 	if (!Array.isArray(input)) return [];
 	const seen = new Set<string>();
-	const out: Array<{ addOnId: string; quantity?: number }> = [];
+	const out: CreateAppointmentAddOn[] = [];
 	for (const a of input) {
 		if (!a || typeof a !== 'object') continue;
 		const src = a as Record<string, unknown>;

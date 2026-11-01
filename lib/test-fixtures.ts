@@ -11,8 +11,8 @@ import type {
 } from '@opencals/storefront-sdk';
 import type { Series } from '@/lib/catalog';
 
-type Loc = { id: string; slug: string; title: string; type: 'physical' | 'online' };
-type Staff = { id: string; slug: string; firstName: string; lastName: string };
+type Loc = Pick<LocationDetailResponse, 'id' | 'slug' | 'title' | 'type'>;
+type Staff = Pick<StaffMemberListItemResponse, 'id' | 'slug' | 'firstName' | 'lastName'>;
 
 export const LOC: Record<string, Loc> = {
 	collingwood: { id: 'loc-collingwood', slug: 'mettle-collingwood', title: 'METTLE Engine House', type: 'physical' },

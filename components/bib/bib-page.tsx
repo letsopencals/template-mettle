@@ -9,17 +9,17 @@ import { Bib } from '@/components/bib/bib';
 import { HeatSheet } from '@/components/bib/heat-sheet';
 import { BeforeYouCome } from '@/components/bib/before-you-come';
 
-const HEAD: Record<'confirmed' | 'payment' | 'approval', { label: string; title: string }> = {
+const HEAD: Record<'confirmed' | NonNullable<Awaiting>, { label: string; title: string }> = {
 	confirmed: { label: 'Booked', title: 'You’re in.' },
-	payment: { label: 'Held', title: 'Places held.' },
-	approval: { label: 'Requested', title: 'Request in.' },
+	awaiting_payment: { label: 'Held', title: 'Places held.' },
+	awaiting_approval: { label: 'Requested', title: 'Request in.' },
 };
 
 function lede(awaiting: Awaiting, count: number, total: string | null, email: string | null): string {
 	const sessions = count === 1 ? 'session is' : 'sessions are';
 	const sum = total ? ` (${total})` : '';
-	if (awaiting === 'payment') return `${count} ${sessions} held for you${sum}, awaiting payment. They lock in once it lands.${email ? ` Details are on their way to ${email}.` : ''}`;
-	if (awaiting === 'approval') return `${count} ${sessions} waiting for the club to confirm${sum}. We email ${email ?? 'you'} as soon as a coach signs it off.`;
+	if (awaiting === 'awaiting_payment') return `${count} ${sessions} held for you${sum}, awaiting payment. They lock in once it lands.${email ? ` Details are on their way to ${email}.` : ''}`;
+	if (awaiting === 'awaiting_approval') return `${count} ${sessions} waiting for the club to confirm${sum}. We email ${email ?? 'you'} as soon as a coach signs it off.`;
 	return `${count} ${sessions} locked in${sum}.${email ? ` The confirmation is on its way to ${email}.` : ''} Pin this on.`;
 }
 

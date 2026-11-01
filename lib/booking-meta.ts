@@ -1,3 +1,4 @@
+import type { AppointmentListItemLocation } from '@opencals/storefront-sdk';
 import { offeringKeyForSlug, classKeyForSlug } from '@/lib/catalog';
 import { classMeta, plateFor, serviceMeta, siteConfig, type Plate } from '@/lib/site-config';
 
@@ -43,7 +44,7 @@ export interface AppointmentLike {
 	} | null;
 	location?: (AddressFields & {
 		title?: string | null;
-		type?: string | null;
+		type?: AppointmentListItemLocation['type'] | null;
 		link?: string | null;
 		address?: string | null;
 	}) | null;

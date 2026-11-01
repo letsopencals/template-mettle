@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import type { AppointmentDetailProduct, AppointmentDetailResponse } from '@opencals/storefront-sdk';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import { classKeyForSlug, serviceKeyForSlug } from '@/lib/catalog';
@@ -12,16 +13,9 @@ import { RackDays } from '@/components/rack/rack-days';
 import { SlotGrid } from '@/components/rack/slot-grid';
 import { Button } from '@/components/ui/button';
 
-interface Appt {
-	id: string;
-	productId: string;
-	staffMemberId: string | null;
-	locationId: string | null;
-	from: string;
-	to: string;
-	numberOfAttendees?: number | null;
-	product?: { slug?: string | null; duration?: number | null } | null;
-}
+type Appt = Pick<AppointmentDetailResponse, 'id' | 'productId' | 'staffMemberId' | 'locationId' | 'from' | 'to' | 'numberOfAttendees'> & {
+	product?: Pick<AppointmentDetailProduct, 'slug' | 'duration'> | null;
+};
 
 const utc = (ms: number) => {
 	const iso = new Date(ms).toISOString();

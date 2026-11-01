@@ -1,23 +1,21 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import type { AppointmentDateRangeSlot, CreateAppointmentAddOn } from '@opencals/storefront-sdk';
 import { useCart } from '@/contexts/cart-context';
 import { useBarUi } from '@/contexts/bar-ui-context';
 import { siteConfig } from '@/lib/site-config';
 
-export interface LoadSlot {
-	productId: string;
+export type LoadSlot = Pick<AppointmentDateRangeSlot, 'productId' | 'staffMemberId' | 'locationId'> & {
 	/** UTC instants. */
 	start: string | number;
 	end: string | number;
-	staffMemberId?: string | null;
-	locationId?: string | null;
-}
+};
 
 export interface LoadRequest {
 	slot: LoadSlot;
 	numberOfAttendees?: number;
-	addOns?: Array<{ addOnId: string; quantity: number }>;
+	addOns?: Array<Required<CreateAppointmentAddOn>>;
 	/** Partner sessions: 2 people on one booking. */
 	people?: number;
 }

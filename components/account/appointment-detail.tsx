@@ -34,7 +34,7 @@ export function AppointmentDetail({ id, initialAction }: { id: string; initialAc
 
 	if (error && !appt) return <AccountError what="this booking" onRetry={() => void mutate()} />;
 	if (isLoading || !appt || !now) return <AccountLoading label="Loading the booking" />;
-	const v = toBookingView(appt as Parameters<typeof toBookingView>[0]);
+	const v = toBookingView(appt);
 	const w = changeWindow(appt, now.getTime());
 
 	const change = async (kind: 'cancel' | 'reschedule', slot?: Record<string, string | null>) => {
@@ -108,7 +108,7 @@ export function AppointmentDetail({ id, initialAction }: { id: string; initialAc
 						{moving ? (
 							<div className="mt-6 border-t-2 border-ink pt-5">
 								<h2 className="display mb-4 text-3xl">Pick a new time</h2>
-								<ReschedulePicker appt={appt as Parameters<typeof ReschedulePicker>[0]['appt']} pending={pending} onMove={(slot) => void change('reschedule', slot)} />
+								<ReschedulePicker appt={appt} pending={pending} onMove={(slot) => void change('reschedule', slot)} />
 							</div>
 						) : null}
 					</div>

@@ -18,7 +18,7 @@ describe('training log', () => {
 	});
 
 	it('keeps pending bookings up next and skips cart holds', () => {
-		const pending = { ...v('p', '2026-11-07', 'pending'), awaiting: 'payment' as const, isHold: false };
+		const pending = { ...v('p', '2026-11-07', 'pending'), awaiting: 'awaiting_payment' as const, isHold: false };
 		const hold = { ...v('h', '2026-11-08', 'pending'), awaiting: null, isHold: true };
 		const s = splitLog([...views, pending, hold], now);
 		expect(s.upcoming.map((x) => x.id)).toEqual(['d', 'p']);

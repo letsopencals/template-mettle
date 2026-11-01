@@ -16,6 +16,8 @@
  * the API. Don't put made-up stats here.
  */
 
+import type { LocationDetailResponse } from '@opencals/storefront-sdk';
+
 /* ------------------------------------------------------------------ Types */
 
 /** Calibrated bumper-plate colours: the discipline language across the site. */
@@ -171,7 +173,7 @@ export const siteConfig = {
 		online: 'online',
 		physical: 'physical',
 		delivery: 'delivery',
-	},
+	} satisfies Record<string, LocationDetailResponse['type']>,
 
 	/**
 	 * Disciplines by collection slug, in display order. The plate is the colour of

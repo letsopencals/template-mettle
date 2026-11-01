@@ -3,28 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
-import type { OrderListItemResponse } from '@opencals/storefront-sdk';
+import type { OrderListItemResponse, OrderListResponse, OrderListTransaction } from '@opencals/storefront-sdk';
 import { fetcher } from '@/lib/fetcher';
 import { formatPrice } from '@/lib/format';
 import { dayLabel } from '@/lib/when';
 import { AccountError, AccountLoading } from '@/components/account/states';
 
-interface OrderPage {
-	data: OrderListItemResponse[];
-	meta: { page: number; hasNextPage: boolean; hasPreviousPage: boolean };
-}
-
-const DUE_BY_PROVIDER: Record<string, string> = {
+const DUE_BY_PROVIDER: Partial<Record<OrderListTransaction['provider'], string>> = {
 	cash: 'Pay at the desk',
 	bank_transfer: 'Awaiting transfer',
 	stripe_invoice: 'Invoice due',
 };
 
 /** The payment word on an order line. Never blank: an unknown status reads as "Payment due". */
-export function paymentLabel(o: { isFullyPaid?: boolean | null; paymentStatus?: string | null; transactions?: ReadonlyArray<{ provider?: string | null }> | null }): string {
+export function paymentLabel(o: Pick<OrderListItemResponse, 'isFullyPaid' | 'paymentStatus'> & { transactions?: ReadonlyArray<Pick<OrderListTransaction, 'provider'>> | null }): string {
 	if (o.paymentStatus === 'voided') return 'Cancelled, not charged';
 	if (o.isFullyPaid || o.paymentStatus === 'paid') return 'Paid';
-	if (o.paymentStatus === 'refunded') return 'Refunded';
 	if (o.paymentStatus === 'partially-paid') return 'Part paid';
 	const provider = o.transactions?.find((t) => t.provider)?.provider;
 	return (provider && DUE_BY_PROVIDER[provider]) || 'Payment due';
@@ -33,7 +27,7 @@ export function paymentLabel(o: { isFullyPaid?: boolean | null; paymentStatus?: 
 /** Every order, newest first, as ruled log lines. */
 export function OrdersView() {
 	const [page, setPage] = useState(1);
-	const { data, error, isLoading, mutate } = useSWR<OrderPage>(`/api/account/orders?take=15&page=${page}`, fetcher, { revalidateOnFocus: false, keepPreviousData: true });
+	const { data, error, isLoading, mutate } = useSWR<OrderListResponse>(`/api/account/orders?take=15&page=${page}`, fetcher, { revalidateOnFocus: false, keepPreviousData: true });
 	const orders = data?.data ?? [];
 	if (error && !data) return <AccountError what="your orders" onRetry={() => void mutate()} />;
 	if (isLoading && !data) return <AccountLoading label="Loading orders" />;

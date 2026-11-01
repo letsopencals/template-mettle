@@ -1,12 +1,12 @@
 'use client';
 
 import { clsx } from 'clsx';
-import type { CartWithDiscounts } from '@/types/discount';
+import type { CartResponse } from '@opencals/storefront-sdk';
 import { formatPrice } from '@/lib/format';
 import { codeState } from '@/lib/discount-state';
 
 /** Subtotal, every applied offer and the total, exactly as the cart returns them. */
-export function BarTotals({ cart, currency, tone = 'chalk', className }: { cart: CartWithDiscounts; currency: string; tone?: 'chalk' | 'rubber'; className?: string }) {
+export function BarTotals({ cart, currency, tone = 'chalk', className }: { cart: CartResponse; currency: string; tone?: 'chalk' | 'rubber'; className?: string }) {
 	const state = codeState(cart);
 	const discounts = cart.appliedDiscounts ?? [];
 	const saved = Math.max(0, cart.subtotal - cart.total);

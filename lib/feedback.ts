@@ -1,11 +1,8 @@
-export type FeedbackQuestionType = 'single-line-text-field' | 'multi-line-text-field' | 'dropdown' | 'rating' | 'checkbox' | 'file-upload';
+import type { FeedbackQuestionResponse } from '@opencals/storefront-sdk';
 
 /** A feedback question ("How was your class?") as the account page renders it. */
-export interface FeedbackQuestionView {
-	id: string;
-	type: FeedbackQuestionType;
-	required: boolean;
+export type FeedbackQuestionView = Pick<FeedbackQuestionResponse, 'id' | 'type' | 'required'> & {
 	title: string;
 	description: string | null;
 	options: string[];
-}
+};

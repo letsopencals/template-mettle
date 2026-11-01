@@ -1,4 +1,4 @@
-import type { AppliedDiscount } from '@/types/discount';
+import type { AppliedDiscount, CartResponse } from '@opencals/storefront-sdk';
 
 /**
  * Discounts never combine: the best single one wins per line. When an
@@ -9,7 +9,7 @@ import type { AppliedDiscount } from '@/types/discount';
  */
 export type CodeState = { status: 'none' } | { status: 'active'; code: string } | { status: 'outranked'; code: string };
 
-export function codeState(cart: { appliedDiscountCode?: string | null; appliedDiscounts?: AppliedDiscount[] | null } | null): CodeState {
+export function codeState(cart: Partial<Pick<CartResponse, 'appliedDiscountCode' | 'appliedDiscounts'>> | null): CodeState {
 	const code = cart?.appliedDiscountCode?.trim();
 	if (!code) return { status: 'none' };
 	const used = (cart?.appliedDiscounts ?? []).some((d) => d.code && d.code.toLowerCase() === code.toLowerCase());
