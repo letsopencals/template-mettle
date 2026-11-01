@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { clsx } from 'clsx';
@@ -19,7 +19,8 @@ import { PromoCode } from '@/components/bar/promo-code';
 import { HoldTimer } from '@/components/bar/hold-timer';
 import { CalibrationStrip } from '@/components/brand/calibration-strip';
 import { Button } from '@/components/ui/button';
-import { FieldLabel, Input, Select, Textarea } from '@/components/ui/input';
+import { FieldError, FieldLabel, Input, Select, Textarea } from '@/components/ui/input';
+import { errorId, fieldAria } from '@/lib/field-errors';
 
 const StripePayment = dynamic(() => import('@/components/checkout/stripe-payment').then((m) => m.StripePayment), {
 	ssr: false,
@@ -110,6 +111,9 @@ function methodCopy(p: CustomerProviderCatalogItem): { title: string; body: stri
 	}
 }
 
+/** Input ids of the "You" fields. */
+const YOU_INPUT_IDS = { firstName: 'first', lastName: 'last', email: 'email' } as const;
+
 /**
  * Checkout: the Bar across the top (not a sticky side card), then three sets
  * stacked: 01 You, 02 Clearance (PAR-Q and questions), 03 Pay. A finished set
@@ -128,6 +132,17 @@ export function CheckoutView() {
 	const hasQuestions = c.questions.some((q) => q.type !== 'file-upload' && q.type !== 'rating');
 	const total = cart ? formatPrice(cart.total, currency) : '';
 	const chosen = method ?? (c.providers.length === 1 ? c.providers[0]?.name : undefined);
+	const fe = c.fieldErrors;
+
+	// A submit came back with a "You" field rejected: put the cursor in the first one (not while typing).
+	const wasSubmitting = useRef(false);
+	useEffect(() => {
+		if (wasSubmitting.current && !c.submitting) {
+			const first = (['firstName', 'lastName', 'email'] as const).find((f) => fe[f]?.length);
+			if (first) document.getElementById(YOU_INPUT_IDS[first])?.focus();
+		}
+		wasSubmitting.current = c.submitting;
+	}, [c.submitting, fe]);
 
 	if (!cart || items.length === 0) {
 		return (
@@ -172,17 +187,20 @@ export function CheckoutView() {
 								<FieldLabel htmlFor="first" required>
 									First name
 								</FieldLabel>
-								<Input id="first" autoComplete="given-name" required value={c.firstName} onChange={(e) => c.setFirstName(e.target.value)} />
+								<Input id="first" autoComplete="given-name" required value={c.firstName} onChange={(e) => c.setFirstName(e.target.value)} {...fieldAria('first', fe.firstName)} />
+								<FieldError id={errorId('first')} messages={fe.firstName} />
 							</div>
 							<div>
 								<FieldLabel htmlFor="last">Last name</FieldLabel>
-								<Input id="last" autoComplete="family-name" value={c.lastName} onChange={(e) => c.setLastName(e.target.value)} />
+								<Input id="last" autoComplete="family-name" value={c.lastName} onChange={(e) => c.setLastName(e.target.value)} {...fieldAria('last', fe.lastName)} />
+								<FieldError id={errorId('last')} messages={fe.lastName} />
 							</div>
 							<div className="sm:col-span-2">
 								<FieldLabel htmlFor="email" required hint="Your booking and sign-in code go here">
 									Email
 								</FieldLabel>
-								<Input id="email" type="email" autoComplete="email" required value={c.email} onChange={(e) => c.setEmail(e.target.value)} disabled={Boolean(c.customerId)} />
+								<Input id="email" type="email" autoComplete="email" required value={c.email} onChange={(e) => c.setEmail(e.target.value)} disabled={Boolean(c.customerId)} {...fieldAria('email', fe.email)} />
+								<FieldError id={errorId('email')} messages={fe.email} />
 							</div>
 							<div className="sm:col-span-2">
 								<Button type="submit" size="lg" loading={c.submitting} disabled={c.isExpired}>

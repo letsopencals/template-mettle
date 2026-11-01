@@ -7,6 +7,7 @@ import type {
 	PaymentProviderName,
 	StorefrontAppointmentPendingReason,
 } from '@opencals/storefront-sdk';
+import { readFieldErrors, type ApiFieldError } from '@/lib/field-errors';
 
 /**
  * What the checkout needs to know after a request: the API's error `code`
@@ -23,6 +24,8 @@ export class CheckoutRequestError extends Error {
 		readonly code: CheckoutErrorCode | null,
 		readonly orderId: NonNullable<CheckoutErrorResponse['orderId']> | null,
 		readonly paymentStatus: NonNullable<CheckoutErrorResponse['paymentStatus']> | null,
+		/** The API's field validation errors, as `/api/*` passes them on. */
+		readonly fieldErrors: ApiFieldError[] = [],
 	) {
 		super(message);
 		this.name = 'CheckoutRequestError';
@@ -44,7 +47,7 @@ export async function checkoutError(res: Response, fallback: string): Promise<Ch
 	} catch {
 		// Not JSON (a proxy error page): keep the fallback message.
 	}
-	return new CheckoutRequestError(str(body.error) ?? fallback, res.status, str(body.code), str(body.orderId), str(body.paymentStatus));
+	return new CheckoutRequestError(str(body.error) ?? fallback, res.status, str(body.code), str(body.orderId), str(body.paymentStatus), readFieldErrors(body));
 }
 
 export type CheckoutMode = CustomerProviderCatalogItem['checkoutMode'];

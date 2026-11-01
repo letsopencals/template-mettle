@@ -15,6 +15,8 @@ export function handleApiError(err: unknown, fallbackMessage = 'Internal server 
 				...(typeof extra.orderId === 'string' ? { orderId: extra.orderId } : {}),
 				...(typeof extra.paymentStatus === 'string' ? { paymentStatus: extra.paymentStatus } : {}),
 				...(Object.keys(fieldErrors).length > 0 && { errors: fieldErrors }),
+				// The API's field errors as sent (full dotted paths, every message): forms map them under each field.
+				...(err.errors?.length ? { fieldErrors: err.errors } : {}),
 			},
 			{ status: err.status },
 		);

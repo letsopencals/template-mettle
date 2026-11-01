@@ -31,3 +31,13 @@ export function FieldLabel({ htmlFor, children, hint, required }: { htmlFor?: st
 		</label>
 	);
 }
+
+/** The API's (or the form's own) messages for one field, right under it. `id` is what the input's aria-describedby points at. */
+export function FieldError({ id, messages }: { id: string; messages?: readonly string[] }) {
+	if (!messages?.length) return null;
+	return (
+		<p id={id} className="mt-1.5 text-xs font-semibold text-plate-red">
+			{messages.join(' ')}
+		</p>
+	);
+}
