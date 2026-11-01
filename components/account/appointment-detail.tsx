@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import useSWR, { mutate as globalMutate } from 'swr';
 import type { AppointmentDetailResponse } from '@opencals/storefront-sdk';
+import { AWAITING_TAG } from '@/lib/checkout-outcome';
 import { fetcher } from '@/lib/fetcher';
 import { onSessionExpired } from '@/lib/session-expired';
 import { toBookingView } from '@/lib/booking-view';
@@ -73,7 +74,7 @@ export function AppointmentDetail({ id, initialAction }: { id: string; initialAc
 						<p className="mt-2 text-ink-2">{longDayLabel(v.start)}</p>
 						<p className="text-sm text-muted">{[v.variant, v.coach ? `with ${v.coach}` : null, v.isOnline ? 'Mettle Remote' : v.locationTitle, v.people > 1 ? `${v.people} people` : null].filter(Boolean).join(' · ')}</p>
 						{v.address ? <p className="text-sm text-muted">{v.address}</p> : null}
-						{v.status === 'canceled' ? <p className="mono mt-2 text-sm text-plate-red">CANCELLED</p> : null}
+						{v.status === 'canceled' ? <p className="mono mt-2 text-sm text-plate-red">CANCELLED</p> : v.awaiting ? <p className="mono mt-2 text-sm text-plate-red">{AWAITING_TAG[v.awaiting]}</p> : null}
 					</div>
 				</div>
 				{message ? (

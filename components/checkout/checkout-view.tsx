@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import type { CheckoutQuestionResponse as CheckoutQuestion, CustomerProviderCatalogItem } from '@opencals/storefront-sdk';
 import { useCheckout, type CheckoutStep } from '@/contexts/checkout-context';
+import { checkoutModeOf } from '@/lib/checkout-outcome';
 import { useCart } from '@/contexts/cart-context';
 import { useSettings } from '@/contexts/settings-context';
 import { barPlates, barProgress } from '@/lib/bar';
@@ -99,7 +100,9 @@ function methodCopy(p: CustomerProviderCatalogItem): { title: string; body: stri
 		case 'cash':
 			return { title: 'Pay at the desk', body: 'Your places are held. Pay by card or phone when you arrive.', action: 'Confirm, pay at the desk' };
 		case 'bank_transfer':
-			return { title: 'Bank transfer', body: 'We email the details. Places are held until it lands.', action: 'Confirm, pay by transfer' };
+			return { title: 'Bank transfer', body: 'Our bank details come up on the next screen and in your email. Places are held until it lands.', action: 'Confirm, pay by transfer' };
+		case 'stripe_invoice':
+			return { title: 'Pay by invoice', body: 'We email an invoice you pay online, by card or bank, before the due date.', action: 'Confirm, send the invoice' };
 		case 'no_payment_required':
 			return { title: 'Nothing to pay', body: 'This one is on us.', action: 'Confirm booking' };
 		default:
@@ -206,8 +209,16 @@ export function CheckoutView() {
 					) : null}
 
 					<SetBlock n={hasQuestions ? 3 : 2} title="Pay" state={state(3)}>
-						{c.step === 'payment' && c.paymentData ? (
-							c.selectedProvider === 'stripe' && c.paymentData.clientSecret ? (
+						{c.holdLost ? (
+							<div role="alert" className="border-l-4 border-plate-red bg-chalk-3 px-4 py-4">
+								<p className="font-semibold">The hold ran out and a place went to someone else.</p>
+								<p className="mt-1 text-sm text-muted">Nothing was charged. Load the bar again with a time that&rsquo;s still open.</p>
+								<Button variant="primary" className="mt-4" onClick={c.restartFromFloor}>
+									Pick a new time
+								</Button>
+							</div>
+						) : c.step === 'payment' && c.paymentData ? (
+							c.paymentData.clientSecret && checkoutModeOf(c.selectedProvider ?? '', c.providers) === 'internal' ? (
 								<StripePayment
 									clientSecret={c.paymentData.clientSecret}
 									stripeAccountId={c.paymentData.stripeAccountId}

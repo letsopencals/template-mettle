@@ -14,10 +14,20 @@ interface OrderPage {
 	meta: { page: number; hasNextPage: boolean; hasPreviousPage: boolean };
 }
 
-export function paymentLabel(o: { isFullyPaid?: boolean | null; paymentStatus?: string | null }): string {
-	if (o.isFullyPaid) return 'Paid';
+const DUE_BY_PROVIDER: Record<string, string> = {
+	cash: 'Pay at the desk',
+	bank_transfer: 'Awaiting transfer',
+	stripe_invoice: 'Invoice due',
+};
+
+/** The payment word on an order line. Never blank: an unknown status reads as "Payment due". */
+export function paymentLabel(o: { isFullyPaid?: boolean | null; paymentStatus?: string | null; transactions?: ReadonlyArray<{ provider?: string | null }> | null }): string {
+	if (o.paymentStatus === 'voided') return 'Cancelled, not charged';
+	if (o.isFullyPaid || o.paymentStatus === 'paid') return 'Paid';
 	if (o.paymentStatus === 'refunded') return 'Refunded';
-	return 'Pay at the desk';
+	if (o.paymentStatus === 'partially-paid') return 'Part paid';
+	const provider = o.transactions?.find((t) => t.provider)?.provider;
+	return (provider && DUE_BY_PROVIDER[provider]) || 'Payment due';
 }
 
 /** Every order, newest first, as ruled log lines. */

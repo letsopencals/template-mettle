@@ -154,10 +154,20 @@ events. Seed dataset `boutique_gym` (backend). Design contract: **DESIGN.md**
   mini rack), booked in one order with `useLoadBar`.
 - **Checkout** (`/checkout`): the Bar across the top, then sets 01 You, 02
   Clearance (the required PAR-Q checkbox + questions; answers sent as
-  `{questionId, question, answer}`), 03 Pay (Stripe, pay at the desk, or the
-  no-payment-required path for the free First Round). Stripe's publishable
-  key comes only from checkout start (`paymentData.publishableKey`).
-- **Thank-you** (`/thank-you`): the race bib + heat sheet (calendar links),
+  `{questionId, question, answer}`), 03 Pay. Routing is on the provider's
+  `checkoutMode` (`lib/checkout-outcome.ts`): `internal` mounts Stripe;
+  `manual` (desk, bank transfer, invoice) and `none` (free First Round)
+  submit right after start. Stripe's publishable key comes only from
+  checkout start (`paymentData.publishableKey`). Checkout 409/402 codes
+  (`CART_ALREADY_CHECKED_OUT`, `CART_EXPIRED`, `CHECKOUT_IN_PROGRESS`,
+  `PAYMENT_NOT_AUTHORIZED`) are handled in `contexts/checkout-context.tsx`.
+- **Booking status**: a booking is waiting only when `status === 'pending'`
+  with a `pendingReason` (payment or the club's approval); pending with no
+  reason is confirmed (a background job is about to confirm it). Pending with
+  no order (`orderLineItem === null`) is a cart hold and stays off the log.
+- **Thank-you** (`/thank-you`): the race bib + heat sheet (calendar links), the
+  pay slip for manual payments (submit's `paymentInstructions`, handed over in
+  sessionStorage; after a reload it points to the email),
   before you come, getting there, same time next week. Without a session it
   asks for a sign-in code.
 - **Account** (`/account`): the Training log (up next with Join/Manage, plate

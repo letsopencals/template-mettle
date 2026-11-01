@@ -17,6 +17,14 @@ describe('training log', () => {
 		expect(s.cancelled.map((x) => x.id)).toEqual(['e']);
 	});
 
+	it('keeps pending bookings up next and skips cart holds', () => {
+		const pending = { ...v('p', '2026-11-07', 'pending'), awaiting: 'payment' as const, isHold: false };
+		const hold = { ...v('h', '2026-11-08', 'pending'), awaiting: null, isHold: true };
+		const s = splitLog([...views, pending, hold], now);
+		expect(s.upcoming.map((x) => x.id)).toEqual(['d', 'p']);
+		expect([...s.done, ...s.cancelled].map((x) => x.id)).not.toContain('h');
+	});
+
 	it('counts plates and the week streak', () => {
 		const done = splitLog(views, now).done;
 		expect(plateCounts(done)).toEqual([

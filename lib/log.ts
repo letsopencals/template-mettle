@@ -16,8 +16,11 @@ export function splitLog(views: readonly BookingView[], now: number): LogSplit {
 	const done: BookingView[] = [];
 	const cancelled: BookingView[] = [];
 	for (const v of views) {
+		// A pending session with no order is a cart hold that expires on its own, not a booking.
+		if (v.isHold) continue;
 		if (v.status === 'canceled') cancelled.push(v);
-		else if (v.end > now && v.status === 'scheduled') upcoming.push(v);
+		// Pending bookings (awaiting payment or the club's approval) are still up next.
+		else if (v.end > now && (v.status === 'scheduled' || v.status === 'pending')) upcoming.push(v);
 		else if (v.start <= now && v.status !== 'pending') done.push(v);
 	}
 	upcoming.sort((a, b) => a.start - b.start);

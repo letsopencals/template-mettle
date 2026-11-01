@@ -7,8 +7,10 @@ import { useSession } from 'next-auth/react';
 import { useCart } from '@/contexts/cart-context';
 import { usePaymentProviders } from '@/hooks/use-payment-providers';
 import { useCheckoutQuestions } from '@/hooks/use-checkout-questions';
+import { checkoutError, checkoutModeOf, CheckoutRequestError, savePaymentInstructions } from '@/lib/checkout-outcome';
 import type {
 	CustomerProviderCatalogItem,
+	CheckoutResponse,
 	CheckoutStartResponse,
 	SubmitCheckout,
 	CartItem,
@@ -17,13 +19,8 @@ import type {
 
 export type CheckoutStep = 'customer' | 'questions' | 'payment-select' | 'payment';
 
-// The backend can override the requested provider with the "no payment required" fallback when nothing
-// is collectible. This template's pinned SDK union predates that value, so accept a widened string here
-// (no `as` assertion; SDK types stay authoritative) and compare against the known fallback name.
-const NO_PAYMENT_REQUIRED_PROVIDER = 'no_payment_required';
-function isNoPaymentRequired(provider: string): boolean {
-	return provider === NO_PAYMENT_REQUIRED_PROVIDER;
-}
+const IN_PROGRESS_RETRIES = 2;
+const IN_PROGRESS_WAIT_MS = 1500;
 
 interface CheckoutContextValue {
 	// State
@@ -31,6 +28,8 @@ interface CheckoutContextValue {
 	error: string | null;
 	submitting: boolean;
 	checkoutComplete: boolean;
+	/** The API answered CART_EXPIRED: a held place was taken, so the bar has to be loaded again. */
+	holdLost: boolean;
 
 	// Customer
 	email: string;
@@ -66,6 +65,7 @@ interface CheckoutContextValue {
 	handleStartCheckout: (providerName: string) => Promise<void>;
 	handleSubmitCheckout: (stripePaymentIntentId?: string) => Promise<void>;
 	extendCart: () => void;
+	restartFromFloor: () => void;
 }
 
 const CheckoutContext = createContext<CheckoutContextValue | undefined>(undefined);
@@ -79,6 +79,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 	const [error, setError] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [checkoutComplete, setCheckoutComplete] = useState(false);
+	const [holdLost, setHoldLost] = useState(false);
 
 	// Customer info
 	const [email, setEmail] = useState('');
@@ -203,48 +204,62 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 		[answers, questions, cartHeaders],
 	);
 
-	// Step 3: Start checkout with selected provider
-	const handleStartCheckout = useCallback(
-		async (providerName: string) => {
-			setError(null);
-			setSubmitting(true);
-			setSelectedProvider(providerName);
-
-			try {
-				const startPayload: Record<string, unknown> = { provider: providerName };
-				if (customerId) {
-					startPayload.customer = { kind: 'existing', customerId };
+	// Shared by start and submit: a 409 CHECKOUT_IN_PROGRESS means another request for this cart (a double
+	// click, a second tab) is still running, so wait a moment and ask again before giving up.
+	const postCheckout = useCallback(
+		async (path: string, body: unknown, fallback: string): Promise<Response> => {
+			for (let attempt = 0; ; attempt++) {
+				const res = await fetch(path, { method: 'POST', headers: cartHeaders(), body: JSON.stringify(body) });
+				if (res.ok) return res;
+				const err = await checkoutError(res, fallback);
+				if (err.code === 'CHECKOUT_IN_PROGRESS' && attempt < IN_PROGRESS_RETRIES) {
+					await new Promise((r) => setTimeout(r, IN_PROGRESS_WAIT_MS));
+					continue;
 				}
-
-				const res = await fetch('/api/checkout/start', {
-					method: 'POST',
-					headers: cartHeaders(),
-					body: JSON.stringify(startPayload),
-				});
-
-				if (!res.ok) {
-					const data = await res.json();
-					throw new Error(data.error || 'Failed to start checkout');
-				}
-
-				const data: CheckoutStartResponse = await res.json();
-				setPaymentData(data);
-
-				// Key off the RESPONSE provider: when nothing is collectible the backend overrides the
-				// requested provider (e.g. Stripe) with "no payment required" — confirm it immediately, like cash.
-				if (providerName === 'cash' || isNoPaymentRequired(data.provider)) {
-					await handleSubmitCheckout();
-				} else if (data.redirectUrl) {
-					window.location.href = data.redirectUrl;
-				} else {
-					setStep('payment');
-				}
-			} catch (err: unknown) {
-				setError(err instanceof Error ? err.message : 'An error occurred');
-				setSubmitting(false);
+				throw err;
 			}
 		},
-		[cartHeaders, customerId], // eslint-disable-line react-hooks/exhaustive-deps
+		[cartHeaders],
+	);
+
+	// Lands on /thank-you for an order: once the booking exists the cart is spent.
+	const finish = useCallback(
+		(orderId: string | null) => {
+			setCheckoutComplete(true);
+			clearCart();
+			router.push(orderId ? `/thank-you?orderId=${encodeURIComponent(orderId)}` : '/thank-you');
+		},
+		[clearCart, router],
+	);
+
+	// Turns a failed checkout request into what the customer sees next.
+	const handleFailure = useCallback(
+		(err: unknown) => {
+			if (!(err instanceof CheckoutRequestError)) {
+				setError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
+				return;
+			}
+			switch (err.code) {
+				case 'CART_ALREADY_CHECKED_OUT':
+					// This bar is already an order (a second tab, a retry after a dropped connection).
+					finish(err.orderId);
+					return;
+				case 'CART_EXPIRED':
+					setHoldLost(true);
+					setError(null);
+					return;
+				case 'CHECKOUT_IN_PROGRESS':
+					setError('Still processing your booking. Give it a few seconds, then press the button again.');
+					return;
+				case 'PAYMENT_NOT_AUTHORIZED':
+					setStep('payment');
+					setError('Your card wasn’t authorised. Nothing was charged. Try again, or use another card.');
+					return;
+				default:
+					setError(err.message);
+			}
+		},
+		[finish],
 	);
 
 	// Step 4: Submit checkout
@@ -257,23 +272,12 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 				const submitPayload: SubmitCheckout = {
 					appointmentsSettings: { markAsScheduled: true },
 				};
-
 				if (stripePaymentIntentId) {
 					submitPayload.stripePaymentIntentId = stripePaymentIntentId;
 				}
 
-				const res = await fetch('/api/checkout/submit', {
-					method: 'POST',
-					headers: cartHeaders(),
-					body: JSON.stringify(submitPayload),
-				});
-
-				if (!res.ok) {
-					const data = await res.json();
-					throw new Error(data.error || 'Checkout failed');
-				}
-
-				const data = await res.json();
+				const res = await postCheckout('/api/checkout/submit', submitPayload, 'Checkout failed');
+				const data: CheckoutResponse = await res.json();
 
 				// Auto-authenticate customer if tokens returned
 				if (data.auth?.accessToken) {
@@ -284,16 +288,64 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 					});
 				}
 
-				setCheckoutComplete(true);
-				clearCart();
-				router.push(`/thank-you?orderId=${data.order?.id ?? ''}`);
+				const orderId = data.order?.id ?? null;
+				if (orderId) savePaymentInstructions(orderId, data.paymentInstructions);
+				finish(orderId);
 			} catch (err: unknown) {
-				setError(err instanceof Error ? err.message : 'An error occurred');
+				handleFailure(err);
+			} finally {
 				setSubmitting(false);
 			}
 		},
-		[cartHeaders, clearCart, router],
+		[postCheckout, finish, handleFailure],
 	);
+
+	// Step 3: Start checkout with selected provider, then route on how that provider checks out.
+	const handleStartCheckout = useCallback(
+		async (providerName: string) => {
+			setError(null);
+			setSubmitting(true);
+			setSelectedProvider(providerName);
+
+			try {
+				const startPayload: Record<string, unknown> = { provider: providerName };
+				if (customerId) {
+					startPayload.customer = { kind: 'existing', customerId };
+				}
+
+				const res = await postCheckout('/api/checkout/start', startPayload, 'Failed to start checkout');
+				const data: CheckoutStartResponse = await res.json();
+				setPaymentData(data);
+
+				// Key off the RESPONSE provider: when nothing is collectible the backend swaps the requested one
+				// (e.g. Stripe) for "no payment required".
+				const provider: string = data.provider ?? providerName;
+				setSelectedProvider(provider);
+				const mode = checkoutModeOf(provider, providers);
+				if (mode === 'manual' || mode === 'none') {
+					// Desk, transfer, invoice or nothing to pay: no card form, place the order now.
+					await handleSubmitCheckout();
+				} else if (mode === 'redirect' && data.redirectUrl) {
+					window.location.href = data.redirectUrl;
+				} else {
+					setStep('payment');
+				}
+			} catch (err: unknown) {
+				handleFailure(err);
+			} finally {
+				setSubmitting(false);
+			}
+		},
+		[customerId, providers, postCheckout, handleSubmitCheckout, handleFailure],
+	);
+
+	// After CART_EXPIRED: the held places are gone, so start a fresh bar on the Floor.
+	const restartFromFloor = useCallback(() => {
+		setHoldLost(false);
+		setCheckoutComplete(true); // keeps the "no cart" effect from racing this navigation
+		clearCart();
+		router.push('/schedule');
+	}, [clearCart, router]);
 
 	const items = useMemo(() => (cart?.items ?? []) as CartItem[], [cart?.items]);
 	const isExpired = timeRemaining !== null && timeRemaining <= 0;
@@ -308,6 +360,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 			error,
 			submitting,
 			checkoutComplete,
+			holdLost,
 			email,
 			firstName,
 			lastName,
@@ -333,12 +386,14 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 			handleStartCheckout,
 			handleSubmitCheckout,
 			extendCart,
+			restartFromFloor,
 		}),
 		[
 			step,
 			error,
 			submitting,
 			checkoutComplete,
+			holdLost,
 			email,
 			firstName,
 			lastName,
@@ -358,6 +413,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 			handleStartCheckout,
 			handleSubmitCheckout,
 			extendCart,
+			restartFromFloor,
 		],
 	);
 

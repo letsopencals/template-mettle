@@ -17,6 +17,7 @@ import { buttonClasses } from '@/components/ui/button';
 import { PlateStack } from '@/components/log/plate-stack';
 import { JoinButton } from '@/components/account/join-button';
 import { AccountError, AccountLoading } from '@/components/account/states';
+import { AWAITING_TAG } from '@/lib/checkout-outcome';
 
 export const BOOKINGS_KEY = '/api/account/appointments?take=100&orderBy=from&order=DESC';
 
@@ -98,6 +99,7 @@ export function TrainingLogView({ views, loading, name }: { views: BookingView[]
 													{v.title}
 												</p>
 												<p className="text-sm text-muted">{[minutesLabel(v.minutes), v.coachFirstName ? `with ${v.coachFirstName}` : null, v.isOnline ? 'Remote' : v.locationTitle].filter(Boolean).join(' · ')}</p>
+												{v.awaiting ? <p className="mono mt-1 text-xs text-plate-red">{AWAITING_TAG[v.awaiting]}</p> : null}
 												<div className="mt-2 flex flex-wrap items-center gap-3">
 													{v.isOnline ? <JoinButton from={new Date(v.start).toISOString()} to={new Date(v.end).toISOString()} url={v.joinUrl} /> : null}
 													<Link href={`/account/appointments/${v.id}`} className="index-label underline underline-offset-4">
@@ -141,7 +143,7 @@ export function TrainingLogView({ views, loading, name }: { views: BookingView[]
 																</Link>
 															</td>
 															<td className="hidden text-muted sm:table-cell">{v.coachFirstName ?? '—'}</td>
-															<td className={clsx('mono w-20 text-right text-xs', upcoming ? 'text-plate-blue' : 'text-plate-green')}>{upcoming ? 'NEXT' : 'DONE ✓'}</td>
+															<td className={clsx('mono w-20 text-right text-xs', v.awaiting ? 'text-plate-red' : upcoming ? 'text-plate-blue' : 'text-plate-green')}>{v.awaiting ? (v.awaiting === 'payment' ? 'TO PAY' : 'TO CONFIRM') : upcoming ? 'NEXT' : 'DONE ✓'}</td>
 														</tr>
 													);
 												})}

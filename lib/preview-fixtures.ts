@@ -36,6 +36,8 @@ function view(id: string, dayOffset: number, time: string, minutes: number, o: P
 		bookAgainHref: '/schedule',
 		plate: plateFor(o.discipline),
 		...o,
+		awaiting: o.awaiting ?? null,
+		isHold: o.isHold ?? false,
 	};
 }
 
