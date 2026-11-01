@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useCart } from '@/contexts/cart-context';
 import { usePaymentProviders } from '@/hooks/use-payment-providers';
 import { useCheckoutQuestions } from '@/hooks/use-checkout-questions';
-import { checkoutError, checkoutModeOf, CheckoutRequestError, savePaymentInstructions, type ProviderName } from '@/lib/checkout-outcome';
+import { checkoutError, checkoutModeOf, CheckoutRequestError, savePaymentInstructions } from '@/lib/checkout-outcome';
 import type {
 	CustomerProviderCatalogItem,
 	CheckoutResponse,
@@ -19,6 +19,7 @@ import type {
 	SubmitCheckout,
 	CartItem,
 	CheckoutQuestionResponse as CheckoutQuestion,
+	PaymentProviderName,
 } from '@opencals/storefront-sdk';
 
 export type CheckoutStep = 'customer' | 'questions' | 'payment-select' | 'payment';
@@ -51,7 +52,7 @@ interface CheckoutContextValue {
 
 	// Payment
 	providers: CustomerProviderCatalogItem[];
-	selectedProvider: ProviderName | null;
+	selectedProvider: PaymentProviderName | null;
 	paymentData: CheckoutStartResponse | null;
 
 	// Cart info
@@ -66,7 +67,7 @@ interface CheckoutContextValue {
 	setError: (error: string | null) => void;
 	handleSaveCustomer: (e: React.FormEvent) => Promise<void>;
 	handleSaveAnswers: (e: React.FormEvent) => Promise<void>;
-	handleStartCheckout: (providerName: ProviderName) => Promise<void>;
+	handleStartCheckout: (providerName: PaymentProviderName) => Promise<void>;
 	handleSubmitCheckout: (stripePaymentIntentId?: string) => Promise<void>;
 	extendCart: () => void;
 	restartFromFloor: () => void;
@@ -111,7 +112,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 	const [answers, setAnswers] = useState<Record<string, string>>({});
 
 	// Payment
-	const [selectedProvider, setSelectedProvider] = useState<ProviderName | null>(null);
+	const [selectedProvider, setSelectedProvider] = useState<PaymentProviderName | null>(null);
 	const [paymentData, setPaymentData] = useState<CheckoutStartResponse | null>(null);
 
 	// Redirect if no cart — but only once CartProvider has read the stored cart id
@@ -306,7 +307,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
 	// Step 3: Start checkout with selected provider, then route on how that provider checks out.
 	const handleStartCheckout = useCallback(
-		async (providerName: ProviderName) => {
+		async (providerName: PaymentProviderName) => {
 			setError(null);
 			setSubmitting(true);
 			setSelectedProvider(providerName);
@@ -323,7 +324,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
 				// Key off the RESPONSE provider: when nothing is collectible the backend swaps the requested one
 				// (e.g. Stripe) for "no payment required".
-				const provider: ProviderName = data.provider ?? providerName;
+				const provider: PaymentProviderName = data.provider ?? providerName;
 				setSelectedProvider(provider);
 				const mode = checkoutModeOf(provider, providers);
 				if (mode === 'manual' || mode === 'none') {

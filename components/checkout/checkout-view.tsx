@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { clsx } from 'clsx';
-import type { CheckoutQuestionResponse as CheckoutQuestion, CustomerProviderCatalogItem } from '@opencals/storefront-sdk';
+import type { CheckoutQuestionResponse as CheckoutQuestion, CustomerProviderCatalogItem, PaymentProviderName } from '@opencals/storefront-sdk';
 import { useCheckout, type CheckoutStep } from '@/contexts/checkout-context';
 import { checkoutModeOf } from '@/lib/checkout-outcome';
 import { useCart } from '@/contexts/cart-context';
@@ -119,7 +119,7 @@ export function CheckoutView() {
 	const c = useCheckout();
 	const { cart, removeItem } = useCart();
 	const { currency } = useSettings();
-	const [method, setMethod] = useState<CustomerProviderCatalogItem['name'] | undefined>(undefined);
+	const [method, setMethod] = useState<PaymentProviderName | undefined>(undefined);
 	const items = useMemo(() => c.items.slice().sort((a, b) => (a.appointment?.from ?? '').localeCompare(b.appointment?.from ?? '')), [c.items]);
 	const plates = useMemo(() => barPlates(items), [items]);
 	const progress = useMemo(() => barProgress(items), [items]);

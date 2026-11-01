@@ -1,7 +1,10 @@
 import type {
 	AppointmentStatusType,
+	CheckoutErrorCode,
+	CheckoutErrorResponse,
 	CustomerProviderCatalogItem,
 	PaymentInstructions,
+	PaymentProviderName,
 	StorefrontAppointmentPendingReason,
 } from '@opencals/storefront-sdk';
 
@@ -17,30 +20,33 @@ export class CheckoutRequestError extends Error {
 	constructor(
 		message: string,
 		readonly status: number,
-		readonly code: string | null,
-		readonly orderId: string | null,
-		readonly paymentStatus: string | null,
+		readonly code: CheckoutErrorCode | null,
+		readonly orderId: NonNullable<CheckoutErrorResponse['orderId']> | null,
+		readonly paymentStatus: NonNullable<CheckoutErrorResponse['paymentStatus']> | null,
 	) {
 		super(message);
 		this.name = 'CheckoutRequestError';
 	}
 }
 
-const str = (v: unknown): string | null => (typeof v === 'string' && v ? v : null);
+/** A failed `/api/checkout/*` response body: `error` is the message, the rest is the API's checkout error body. */
+type CheckoutErrorBody = { error?: string } & Partial<CheckoutErrorResponse>;
+
+/** A non-empty string field, else null (the body is parsed JSON, so check at runtime). */
+const str = <T extends string>(v: T | null | undefined): T | null => (typeof v === 'string' && v ? v : null);
 
 /** Turns a failed `/api/checkout/*` response into a CheckoutRequestError (never throws on a non-JSON body). */
 export async function checkoutError(res: Response, fallback: string): Promise<CheckoutRequestError> {
-	let body: Record<string, unknown> = {};
+	let body: CheckoutErrorBody = {};
 	try {
 		const parsed: unknown = await res.json();
-		if (parsed && typeof parsed === 'object') body = parsed as Record<string, unknown>;
+		if (parsed && typeof parsed === 'object') body = parsed as CheckoutErrorBody;
 	} catch {
 		// Not JSON (a proxy error page): keep the fallback message.
 	}
 	return new CheckoutRequestError(str(body.error) ?? fallback, res.status, str(body.code), str(body.orderId), str(body.paymentStatus));
 }
 
-export type ProviderName = CustomerProviderCatalogItem['name'];
 export type CheckoutMode = CustomerProviderCatalogItem['checkoutMode'];
 
 /**
@@ -49,7 +55,7 @@ export type CheckoutMode = CustomerProviderCatalogItem['checkoutMode'];
  * place the order straight away. The backend can swap in
  * `no_payment_required` at start, so that name always means `none`.
  */
-export function checkoutModeOf(providerName: ProviderName | null, providers: ReadonlyArray<Pick<CustomerProviderCatalogItem, 'name' | 'checkoutMode'>>): CheckoutMode {
+export function checkoutModeOf(providerName: PaymentProviderName | null, providers: ReadonlyArray<Pick<CustomerProviderCatalogItem, 'name' | 'checkoutMode'>>): CheckoutMode {
 	if (providerName === 'no_payment_required') return 'none';
 	const mode = providers.find((p) => p.name === providerName)?.checkoutMode;
 	if (mode === 'internal' || mode === 'redirect' || mode === 'manual' || mode === 'none') return mode;

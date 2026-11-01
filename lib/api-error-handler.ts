@@ -1,4 +1,4 @@
-import { OpencalsApiError } from '@opencals/storefront-sdk';
+import { OpencalsApiError, type CheckoutErrorResponse } from '@opencals/storefront-sdk';
 import { NextResponse } from 'next/server';
 
 
@@ -6,7 +6,7 @@ export function handleApiError(err: unknown, fallbackMessage = 'Internal server 
 	if (err instanceof OpencalsApiError) {
 		// The API puts `orderId` (409 CART_ALREADY_CHECKED_OUT) and `paymentStatus` (402 PAYMENT_NOT_AUTHORIZED)
 		// next to `code` in the error body; pass them on so the checkout can act on them.
-		const extra = err.body ?? {};
+		const extra = (err.body ?? {}) as Partial<CheckoutErrorResponse>;
 		const fieldErrors = err.toFieldErrors();
 		return NextResponse.json(
 			{

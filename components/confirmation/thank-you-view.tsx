@@ -4,16 +4,16 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
-import type { OrderDetailResponse, PaymentInstructions } from '@opencals/storefront-sdk';
+import type { OrderDetailResponse, PaymentInstructions, PaymentProviderName } from '@opencals/storefront-sdk';
 import { fetcher } from '@/lib/fetcher';
 import { formatPrice } from '@/lib/format';
 import { toBookingView, type BookingView } from '@/lib/booking-view';
 import { buttonClasses } from '@/components/ui/button';
 import { BibPage } from '@/components/bib/bib-page';
 import { PaySlip } from '@/components/bib/pay-slip';
-import { awaitingOf, loadPaymentInstructions, orderAwaiting, type Awaiting, type ProviderName } from '@/lib/checkout-outcome';
+import { awaitingOf, loadPaymentInstructions, orderAwaiting, type Awaiting } from '@/lib/checkout-outcome';
 
-const MANUAL_PROVIDERS = new Set<ProviderName>(['cash', 'bank_transfer', 'stripe_invoice']);
+const MANUAL_PROVIDERS = new Set<PaymentProviderName>(['cash', 'bank_transfer', 'stripe_invoice']);
 
 function awaitingOfOrder(order: OrderDetailResponse | undefined): Awaiting {
 	return orderAwaiting((order?.lineItems ?? []).map((li) => (li.appointment ? awaitingOf(li.appointment.status, li.appointment.pendingReason) : null)));

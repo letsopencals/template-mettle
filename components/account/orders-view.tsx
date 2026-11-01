@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
-import type { OrderListItemResponse, OrderListResponse, OrderListTransaction } from '@opencals/storefront-sdk';
+import type { OrderListItemResponse, OrderListResponse, OrderListTransaction, PaymentProviderName } from '@opencals/storefront-sdk';
 import { fetcher } from '@/lib/fetcher';
 import { formatPrice } from '@/lib/format';
 import { dayLabel } from '@/lib/when';
 import { AccountError, AccountLoading } from '@/components/account/states';
 
-const DUE_BY_PROVIDER: Partial<Record<OrderListTransaction['provider'], string>> = {
+const DUE_BY_PROVIDER: Partial<Record<PaymentProviderName, string>> = {
 	cash: 'Pay at the desk',
 	bank_transfer: 'Awaiting transfer',
 	stripe_invoice: 'Invoice due',

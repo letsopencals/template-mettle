@@ -5,8 +5,8 @@ import {
 	type AppointmentDateRangeSlot,
 	type CheckoutQuestionAnswer,
 	type CreateAppointmentAddOn,
-	type ExistingOrderCustomer,
-	type NewOrderCustomer,
+	type ExistingAppointmentCustomer,
+	type NewAppointmentCustomer,
 } from '@opencals/storefront-sdk';
 import { getAccessToken } from '@/lib/api-auth';
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,10 +15,6 @@ import { handleApiError } from '@/lib/api-error-handler';
 import { sanitizeAddOns, sanitizePeople } from '@/app/api/_lib/guards';
 import { siteConfig } from '@/lib/site-config';
 import { publicPayload } from '@/lib/public-payload';
-
-/** The optional customer on a book request: `kind` picks existing (by id) or new (by email), as in checkout. */
-type CustomerInput = { kind?: (ExistingOrderCustomer | NewOrderCustomer)['kind'] } & Partial<Pick<ExistingOrderCustomer, 'customerId'>> &
-	Partial<Pick<NewOrderCustomer, 'email' | 'firstName' | 'lastName'>>;
 
 export async function POST(request: NextRequest) {
 	const cartIdHeader = request.headers.get('X-Cart-Id') ?? '';
@@ -29,7 +25,7 @@ export async function POST(request: NextRequest) {
 			slot: AppointmentDateRangeSlot;
 			numberOfAttendees?: number;
 			addOns?: CreateAppointmentAddOn[];
-			customer?: CustomerInput;
+			customer?: ExistingAppointmentCustomer | NewAppointmentCustomer;
 			checkoutQuestionAnswers?: CheckoutQuestionAnswer[];
 			/** Privates: "2" for a duet. Sent as appointment customAttributes.people. */
 			people?: unknown;
@@ -68,7 +64,12 @@ export async function POST(request: NextRequest) {
 						customer:
 							customer.kind === 'existing' && customer.customerId
 								? { customerId: customer.customerId }
-								: { externalId: customer.email ?? '', email: customer.email ?? '', firstName: customer.firstName, lastName: customer.lastName },
+								: {
+										externalId: ('email' in customer ? customer.email : undefined) ?? '',
+										email: ('email' in customer ? customer.email : undefined) ?? '',
+										firstName: 'firstName' in customer ? customer.firstName : undefined,
+										lastName: 'lastName' in customer ? customer.lastName : undefined,
+									},
 					}
 				: {}),
 				...(checkoutQuestionAnswers && checkoutQuestionAnswers.length > 0
