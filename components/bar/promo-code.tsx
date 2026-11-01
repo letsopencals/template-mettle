@@ -1,16 +1,17 @@
 'use client';
 
 import { useId, useState } from 'react';
+import type { DiscountCodeErrorResponse } from '@opencals/storefront-sdk';
 import { clsx } from 'clsx';
 import { useCart } from '@/contexts/cart-context';
 import { codeState } from '@/lib/discount-state';
 
-const ERRORS: Record<string, string> = {
+const ERRORS: Partial<Record<DiscountCodeErrorResponse['code'], string>> = {
 	CODE_NOT_FOUND: 'We don’t recognise that code.',
 	CODE_EXPIRED: 'That code has expired.',
-	CODE_USAGE_LIMIT_REACHED: 'That code has been used up.',
+	CODE_LIMIT_REACHED: 'That code has been used up.',
 	CODE_NO_MATCHING_ITEMS: 'That code doesn’t cover anything on your bar.',
-	MINIMUM_REQUIREMENT_NOT_MET: 'Add a little more to use that code.',
+	minimum_requirement_not_met: 'Add a little more to use that code.',
 };
 
 /** "Got a code?" line; an applied code shows as a chalk tag with Remove. */
