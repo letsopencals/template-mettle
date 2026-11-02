@@ -9,12 +9,14 @@ import { codeState } from '@/lib/discount-state';
 export function BarTotals({ cart, currency, tone = 'chalk', className }: { cart: CartResponse; currency: string; tone?: 'chalk' | 'rubber'; className?: string }) {
 	const state = codeState(cart);
 	const discounts = cart.appliedDiscounts ?? [];
-	const saved = Math.max(0, cart.subtotal - cart.total);
+	// The cart's `subtotal` is already net of discounts, so the gross line adds the applied offers back.
+	const saved = Math.round(discounts.reduce((s, d) => s + (d.totalAmount ?? 0), 0) * 100) / 100;
+	const gross = cart.subtotal + saved;
 	return (
 		<dl className={clsx('space-y-1.5 text-sm', className)}>
 			<div className="flex justify-between gap-4">
 				<dt className={tone === 'chalk' ? 'text-muted' : 'text-chalk/60'}>Sessions & extras</dt>
-				<dd className="mono">{formatPrice(cart.subtotal, currency)}</dd>
+				<dd className="mono">{formatPrice(gross, currency)}</dd>
 			</div>
 			{discounts.map((d) => (
 				<div key={d.id} className="flex justify-between gap-4">
