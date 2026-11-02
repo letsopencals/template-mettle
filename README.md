@@ -4,7 +4,7 @@ A production-ready booking website for a boutique gym, boxing club or strength s
 
 **[View Live Demo →](https://template-mettle.vercel.app)**
 
-<!-- TODO(media): add docs/cover.png (device photo in the gym) and the screenshots (Floor, slot rack, the Bar, checkout, bib, training log, mobile) once Gemini credits are topped up and the store is seeded. -->
+![METTLE on a laptop and a phone at the front desk of the Engine House: the Floor with every class of the day on one clock, and the hour-by-hour list on the phone](docs/cover.png)
 
 Rubber flooring and chalk, calibrated bumper-plate colours as the language of the whole site, and LED interval-timer readouts. METTLE is a strength, fight and recovery club in **Melbourne** (AUD, `Australia/Melbourne`): the Engine House in Collingwood, the Yard in Cremorne and Mettle Remote online, with twelve coaches in three tiers. It has a full storefront: **the Floor**, every class of the day on one clock; personal training at 30, 60 or 90 minutes; partner sessions, padwork and ring hire; a contrast suite, infrared suites and open floor; a testing lab; dated events; **Training Blocks** that unlock real discounts as you load the bar; a race-bib confirmation; and a training log. MIT licensed: clone it, rebrand it, ship it.
 
@@ -42,6 +42,22 @@ That's it. Card payments use the Stripe account connected to your store; the key
 
 ---
 
+## The Site
+
+![Homepage — "Built with mettle", the hero video and the live board of the next classes with places left](docs/homepage-hero.png)
+
+![Coaches — twelve coaches in three tiers, each with their plate colours](docs/coaches.png)
+
+![A coach — Tane Wiremu, Head of Fight, with his next classes](docs/coach.png)
+
+![The Lab — InBody, movement screen, VO2 max, nutrition and the free First Round intro](docs/lab.png)
+
+![Events — dated workshops: deadlift clinic, fight night prep, hybrid race day](docs/events.png)
+
+![Memberships — Iron, Steel and Mettle, launching 2027, with the founding-member offer](docs/memberships.png)
+
+---
+
 ## What's Included
 
 ### The Floor (`/schedule`)
@@ -49,6 +65,10 @@ That's it. Card payments use the Stripe account connected to your store; the key
 The whole day on one horizontal clock, from 06:00 to 22:00, with **one lane per discipline**: strength, fight, conditioning, mobility, semi-private coaching and events. Each session is a block in its discipline's plate colour, placed by start time and as wide as it is long. It shows the coach, the site and a places-left fill. A **Full** session is hatched black and points to the next one with space. The day row sits right above the board, and the filters cover site, discipline, coach and intensity. Everything lives in the URL, so `/schedule?s=<series>@<start>` opens a session directly.
 
 Tapping a session opens its **panel, docked under the board**. It shows the coach, the site, the intensity, any entry requirement, the extras, places for friends, the price with any Midday-shift offer, and **Load the bar**. On phones the lanes become an hour-by-hour list and the panel is a bottom sheet.
+
+![The Floor — Monday on one clock, a lane per discipline, places left on every session and a Full session hatched](docs/schedule.png)
+
+![A session panel — Muay Thai with the coach, extras, places and Load the bar](docs/session.png)
 
 ### The Slot Rack (`/coaching`, `/recovery`, `/lab`)
 
@@ -61,9 +81,17 @@ One-to-ones, recovery and testing all book the same way:
 
 The summary with the live price and **Load the bar** sits beside the slots on desktop and is pinned to the bottom on phones. Free windows load once per service, coach and site, and every day and start time is worked out from them in the browser.
 
+![The slot rack — an hour of personal training with any head coach at the Yard, Monday 17:00](docs/coaching.png)
+
+![Recovery — the contrast suite with places left on every slot](docs/recovery.png)
+
 ### The Bar and Training Blocks
 
 The cart is a **barbell**. Every session you book racks a plate in its discipline's colour, and the scale under the bar marks the **Training Block thresholds**: load A$150 in one order for 10% off, A$300 for 15%. These are real automatic minimum-purchase discounts in the store, and the totals always come from the cart. **`/blocks`** has four curated blocks (Fight Week, Strong Start, Engine Block, Recovery Ritual). You fill each line from the Floor or the rack, then book the whole block in one order.
+
+![The Bar — three classes racked as plates, the A$150 and A$300 thresholds, and the first-order offer](docs/bar.png)
+
+![Training Blocks — Fight Week, Strong Start, Engine Block and Recovery Ritual, filled from the Floor](docs/blocks.png)
 
 ### Checkout, the Bib and the Training Log
 
@@ -78,6 +106,18 @@ The cart is a **barbell**. Every session you book racks a plate in its disciplin
   - up next, with Join for Remote sessions, Move and Cancel up to 12 hours before;
   - a stack of plates for every finished session, by discipline;
   - every session written up week by week.
+
+![Checkout — the Bar across the top, then You, Clearance and Pay](docs/checkout.png)
+
+![The race bib — booking 4127 for Mia Kovač, the heat sheet with calendar links, what to bring and getting there](docs/thank-you.png)
+
+![The training log — up next with move and cancel, the plate stack, and every session week by week](docs/account.png)
+
+<p align="center">
+  <img src="docs/mobile-floor.png" width="260" alt="The Floor on a phone, hour by hour" />
+  <img src="docs/mobile-thank-you.png" width="260" alt="The race bib on a phone" />
+  <img src="docs/mobile-home.png" width="260" alt="The homepage on a phone" />
+</p>
 
   Orders and settings sit alongside it.
 
