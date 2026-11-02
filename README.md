@@ -4,7 +4,7 @@ A production-ready booking website for a boutique gym, boxing club or strength s
 
 **[View Live Demo →](https://template-mettle.vercel.app)**
 
-![METTLE on a laptop and a phone at the front desk of the Engine House: the Floor with every class of the day on one clock, and the hour-by-hour list on the phone](docs/cover.png)
+![METTLE in the Engine House: a chalky hand holds a phone with the day's classes in plate colours, and the homepage on a tablet at the front desk behind it](docs/cover.png)
 
 Rubber flooring and chalk, calibrated bumper-plate colours as the language of the whole site, and LED interval-timer readouts. METTLE is a strength, fight and recovery club in **Melbourne** (AUD, `Australia/Melbourne`): the Engine House in Collingwood, the Yard in Cremorne and Mettle Remote online, with twelve coaches in three tiers. It has a full storefront: **the Floor**, every class of the day on one clock; personal training at 30, 60 or 90 minutes; partner sessions, padwork and ring hire; a contrast suite, infrared suites and open floor; a testing lab; dated events; **Training Blocks** that unlock real discounts as you load the bar; a race-bib confirmation; and a training log. MIT licensed: clone it, rebrand it, ship it.
 
