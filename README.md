@@ -66,9 +66,9 @@ The whole day on one horizontal clock, from 06:00 to 22:00, with **one lane per 
 
 Tapping a session opens its **panel, docked under the board**. It shows the coach, the site, the intensity, any entry requirement, the extras, places for friends, the price with any Midday-shift offer, and **Load the bar**. On phones the lanes become an hour-by-hour list and the panel is a bottom sheet.
 
-![The Floor — Monday on one clock, a lane per discipline, places left on every session and a Full session hatched](docs/schedule.png)
+![The Floor — Wednesday on one clock, a lane per discipline, places left on every session and Full sessions hatched](docs/schedule.png)
 
-![A session panel — Muay Thai with the coach, extras, places and Load the bar](docs/session.png)
+![A session panel — Boxing Fundamentals with the coach, extras, places and Load the bar](docs/session.png)
 
 ### The Slot Rack (`/coaching`, `/recovery`, `/lab`)
 
@@ -81,7 +81,7 @@ One-to-ones, recovery and testing all book the same way:
 
 The summary with the live price and **Load the bar** sits beside the slots on desktop and is pinned to the bottom on phones. Free windows load once per service, coach and site, and every day and start time is worked out from them in the browser.
 
-![The slot rack — an hour of personal training with any head coach at the Yard, Monday 17:00](docs/coaching.png)
+![The slot rack — an hour of personal training with any head coach at the Yard, Wednesday 17:00](docs/coaching.png)
 
 ![Recovery — the contrast suite with places left on every slot](docs/recovery.png)
 
