@@ -21,6 +21,13 @@ describe('slot rack starts', () => {
 		expect(starts[0]!.staffMemberId).toBe('staff-a');
 	});
 
+	it('keeps a window that opens mid-minute on the grid, so coaches share one start', () => {
+		const late = { ...range('2026-11-02', '07:09', '09:00'), start: at('2026-11-02', '07:09') + 5_000 };
+		const starts = startsFrom([late, range('2026-11-02', '07:30', '09:00', { staffMemberIds: ['staff-b'] })], { durationMin: 60, stepMin: 30, now });
+		expect(starts.map((s) => s.localTime)).toEqual(['07:30', '08:00']);
+		expect(starts.every((s) => s.start % 60_000 === 0)).toBe(true);
+	});
+
 	it('needs the whole length to fit', () => {
 		expect(startsFrom([range('2026-11-02', '07:00', '08:00')], { durationMin: 90, stepMin: 30, now })).toEqual([]);
 	});

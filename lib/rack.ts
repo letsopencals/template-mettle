@@ -47,7 +47,10 @@ export function startsFrom(ranges: readonly FreeRange[], { durationMin, stepMin,
 		const [h, m] = p.time.split(':').map(Number);
 		const mins = (h ?? 0) * 60 + (m ?? 0);
 		const aligned = Math.ceil(mins / stepMin) * stepMin;
-		let t = r.start + (aligned - mins) * 60_000;
+		// A window that opens "now" carries seconds (19:09:05): snap to the whole minute, or its starts sit off
+		// the grid and duplicate other coaches' 7:00 PM as 7:00:05 PM.
+		let t = r.start - (r.start % 60_000) + (aligned - mins) * 60_000;
+		if (t < r.start) t += stepMin * 60_000;
 		for (; t + len <= r.end; t += stepMin * 60_000) {
 			if (t < earliest || t <= now) continue;
 			if (byStart.has(t)) continue;
