@@ -143,8 +143,12 @@ events. Seed dataset `boutique_gym` (backend). Design contract: **DESIGN.md**
 - **The Bar** (`lib/bar.ts`, `components/bar/*`): one plate per cart item
   coloured by discipline; the scale shows `siteConfig.blockThresholds`
   (A$150 → 10%, A$300 → 15%: the store's automatic minimum-purchase
-  discounts). **Totals always come from the cart**; thresholds only drive the
-  "Add $12 more for Loaded" copy.
+  discounts). **The total and each offer come from the cart**; thresholds only
+  drive the "Add $12 more for Loaded" copy. The API's `subtotal` (cart and order)
+  is already net of offers, so the "Sessions & extras" gross is rebuilt from the
+  lines' `originalSubtotal` with `grossSubtotal()`, and a session's price is
+  `linePrice()` (the session plus its add-ons after offers), on the Bar and the
+  order page alike.
 - **Discounts never combine**: per line the biggest wins (First rep 25% on
   classes, first order; Midday shift 20% on classes starting Mon–Fri
   11:00–14:30; Block 10/15%; code `METTLE10`). An outranked code shows as

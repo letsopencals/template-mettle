@@ -66,3 +66,31 @@ export function progressFor(loaded: number, thresholds: readonly Threshold[] = s
 		ratio: Math.max(0, Math.min(1, loaded / (top * 1.1))),
 	};
 }
+
+interface GrossLine {
+	originalSubtotal: number;
+	appointment?: { status?: string | null } | null;
+	/** Cart lines carry `addOnItems`, order lines `addOnLineItems`. */
+	addOnItems?: ReadonlyArray<{ originalSubtotal: number }> | null;
+	addOnLineItems?: ReadonlyArray<{ originalSubtotal: number }> | null;
+}
+
+/**
+ * Everything before offers, for a cart or an order. The API's `subtotal` is already net of discounts and has no
+ * gross field, so this adds up each line's and add-on's `originalSubtotal` in whole cents, skipping cancelled
+ * sessions as the order's own subtotal does.
+ */
+export function grossSubtotal(lines: readonly GrossLine[] | null | undefined): number {
+	const cents = (lines ?? []).reduce((sum, line) => {
+		if (line.appointment?.status === 'canceled') return sum;
+		const addOns = (line.addOnItems ?? line.addOnLineItems ?? []).reduce((a, ao) => a + Math.round(ao.originalSubtotal * 100), 0);
+		return sum + Math.round(line.originalSubtotal * 100) + addOns;
+	}, 0);
+	return cents / 100;
+}
+
+/** A session's price on the Bar and in an order: the session plus its add-ons, after offers. */
+export function linePrice(line: { discountedTotal: number; addOnItems?: ReadonlyArray<{ discountedTotal: number }> | null; addOnLineItems?: ReadonlyArray<{ discountedTotal: number }> | null }): number {
+	const cents = (line.addOnItems ?? line.addOnLineItems ?? []).reduce((a, ao) => a + Math.round(ao.discountedTotal * 100), Math.round(line.discountedTotal * 100));
+	return cents / 100;
+}

@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import type { CartItem } from '@opencals/storefront-sdk';
 import { Plate } from '@/components/brand/plate';
 import { getBookingMeta } from '@/lib/booking-meta';
+import { linePrice } from '@/lib/bar';
 import { formatPrice } from '@/lib/format';
 import { dayLabel, minutesLabel, timeLabel } from '@/lib/when';
 
@@ -22,7 +23,7 @@ export function BarLine({ item, currency, onRemove, removing, tone = 'chalk' }: 
 						{meta.title}
 						{meta.variant && meta.kindLabel !== 'Class' ? <span className={clsx('font-normal', muted)}> · {meta.variant}</span> : null}
 					</p>
-					<p className="mono shrink-0 text-sm">{formatPrice(item.discountedTotal, currency)}</p>
+					<p className="mono shrink-0 text-sm">{formatPrice(linePrice(item), currency)}</p>
 				</div>
 				<p className={clsx('mono mt-1 text-[0.78rem]', muted)}>
 					{dayLabel(appt.from)} · {timeLabel(appt.from)} · {minutesLabel(meta.minutes)}

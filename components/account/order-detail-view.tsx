@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import type { OrderDetailResponse } from '@opencals/storefront-sdk';
 import { fetcher } from '@/lib/fetcher';
 import { formatPrice } from '@/lib/format';
+import { grossSubtotal, linePrice } from '@/lib/bar';
 import { toBookingView } from '@/lib/booking-view';
 import { dayLabel, timeLabel } from '@/lib/when';
 import { Plate } from '@/components/brand/plate';
@@ -17,6 +18,9 @@ export function OrderDetailView({ id }: { id: string }) {
 	if (error && !o) return <AccountError what="this order" onRetry={() => void mutate()} />;
 	if (isLoading || !o) return <AccountLoading label="Loading the order" />;
 	const cur = o.paymentCurrencyCode;
+	// The order's `subtotal` is already net of offers, so the gross is rebuilt from the lines.
+	const gross = grossSubtotal(o.lineItems);
+	const offers = Math.max(0, Math.round((gross - o.subtotal) * 100) / 100);
 	return (
 		<div className="max-w-3xl">
 			<Link href="/account/orders" className="index-label text-muted hover:text-ink">
@@ -47,7 +51,7 @@ export function OrderDetailView({ id }: { id: string }) {
 									</span>
 								) : null}
 							</span>
-							<span className="mono">{formatPrice(li.discountedTotal, cur)}</span>
+							<span className="mono">{formatPrice(linePrice(li), cur)}</span>
 						</li>
 					);
 				})}
@@ -55,12 +59,18 @@ export function OrderDetailView({ id }: { id: string }) {
 			<dl className="ml-auto mt-4 max-w-xs space-y-1 text-sm">
 				<div className="flex justify-between">
 					<dt className="text-muted">Subtotal</dt>
-					<dd className="mono">{formatPrice(o.subtotal, cur)}</dd>
+					<dd className="mono">{formatPrice(gross, cur)}</dd>
 				</div>
-				{o.subtotal > o.total ? (
+				{offers > 0 ? (
 					<div className="flex justify-between">
 						<dt className="text-muted">Offers</dt>
-						<dd className="mono text-plate-green">−{formatPrice(o.subtotal - o.total, cur)}</dd>
+						<dd className="mono text-plate-green">−{formatPrice(offers, cur)}</dd>
+					</div>
+				) : null}
+				{!o.taxesIncluded && o.totalTax > 0 ? (
+					<div className="flex justify-between">
+						<dt className="text-muted">Tax</dt>
+						<dd className="mono">{formatPrice(o.totalTax, cur)}</dd>
 					</div>
 				) : null}
 				<div className="flex justify-between border-t border-ink/15 pt-2">

@@ -4,14 +4,14 @@ import { clsx } from 'clsx';
 import type { CartResponse } from '@opencals/storefront-sdk';
 import { formatPrice } from '@/lib/format';
 import { codeState } from '@/lib/discount-state';
+import { grossSubtotal } from '@/lib/bar';
 
-/** Subtotal, every applied offer and the total, exactly as the cart returns them. */
+/** The gross before offers, every applied offer, tax and the cart's total. */
 export function BarTotals({ cart, currency, tone = 'chalk', className }: { cart: CartResponse; currency: string; tone?: 'chalk' | 'rubber'; className?: string }) {
 	const state = codeState(cart);
 	const discounts = cart.appliedDiscounts ?? [];
-	// The cart's `subtotal` is already net of discounts, so the gross line adds the applied offers back.
-	const saved = Math.round(discounts.reduce((s, d) => s + (d.totalAmount ?? 0), 0) * 100) / 100;
-	const gross = cart.subtotal + saved;
+	const gross = grossSubtotal(cart.items);
+	const saved = Math.max(0, Math.round((gross - cart.subtotal) * 100) / 100);
 	return (
 		<dl className={clsx('space-y-1.5 text-sm', className)}>
 			<div className="flex justify-between gap-4">
@@ -27,6 +27,12 @@ export function BarTotals({ cart, currency, tone = 'chalk', className }: { cart:
 					<dd className="mono text-plate-green">−{formatPrice(d.totalAmount, currency)}</dd>
 				</div>
 			))}
+			{!cart.taxesIncluded && cart.totalTax > 0 ? (
+				<div className="flex justify-between gap-4">
+					<dt className={tone === 'chalk' ? 'text-muted' : 'text-chalk/60'}>Tax</dt>
+					<dd className="mono">{formatPrice(cart.totalTax, currency)}</dd>
+				</div>
+			) : null}
 			{state.status === 'outranked' ? (
 				<p className={clsx('text-xs', tone === 'chalk' ? 'text-muted' : 'text-chalk/60')}>
 					{state.code} is on the order, but a better offer already applies. Offers don&rsquo;t stack: each session gets the biggest one.
