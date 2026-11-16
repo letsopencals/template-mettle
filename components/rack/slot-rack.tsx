@@ -59,7 +59,9 @@ export function SlotRack({
 }) {
 	const { currency } = useSettings();
 	const now = useNow(60_000);
-	const [seriesId, setSeriesId] = useState(offering.series[0]?.id ?? '');
+	// Options in price order (Coach, Senior, Head), not the API's slug order.
+	const options = useMemo(() => [...offering.series].sort((a, b) => a.price - b.price), [offering.series]);
+	const [seriesId, setSeriesId] = useState(options[0]?.id ?? '');
 	const series = offering.series.find((s) => s.id === seriesId) ?? offering.series[0]!;
 
 	const coachChoices = useMemo(() => series.coachIds.map((id) => coaches[id]).filter((c): c is RackCoach => Boolean(c)), [series, coaches]);
@@ -169,7 +171,7 @@ export function SlotRack({
 								setSeriesId(v);
 								setPicked(null);
 							}}
-							options={offering.series.map((s) => ({ value: s.id, label: s.label || offering.short, sub: `${formatPrice(s.price, currency)}${s.allowCustomDuration ? ` / ${s.durationMin} min` : ''}` }))}
+							options={options.map((s) => ({ value: s.id, label: s.label || offering.short, sub: `${formatPrice(s.price, currency)}${s.allowCustomDuration ? ` / ${s.durationMin} min` : ''}` }))}
 						/>
 					</Step>
 				) : null}
