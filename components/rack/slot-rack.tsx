@@ -242,6 +242,7 @@ export function SlotRack({
 						<>
 							<RackDays
 								days={days}
+								loading={isLoading && !ranges}
 								value={day}
 								today={today}
 								onChange={(d) => {
