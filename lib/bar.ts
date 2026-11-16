@@ -89,8 +89,8 @@ export function grossSubtotal(lines: readonly GrossLine[] | null | undefined): n
 	return cents / 100;
 }
 
-/** A session's price on the Bar and in an order: the session plus its add-ons, after offers. */
-export function linePrice(line: { discountedTotal: number; addOnItems?: ReadonlyArray<{ discountedTotal: number }> | null; addOnLineItems?: ReadonlyArray<{ discountedTotal: number }> | null }): number {
-	const cents = (line.addOnItems ?? line.addOnLineItems ?? []).reduce((a, ao) => a + Math.round(ao.discountedTotal * 100), Math.round(line.discountedTotal * 100));
+/** A session's price on the Bar and in an order: the session plus its add-ons, after offers and before tax (tax has its own row). */
+export function linePrice(line: { discountedSubtotal: number; addOnItems?: ReadonlyArray<{ discountedSubtotal: number }> | null; addOnLineItems?: ReadonlyArray<{ discountedSubtotal: number }> | null }): number {
+	const cents = (line.addOnItems ?? line.addOnLineItems ?? []).reduce((a, ao) => a + Math.round(ao.discountedSubtotal * 100), Math.round(line.discountedSubtotal * 100));
 	return cents / 100;
 }

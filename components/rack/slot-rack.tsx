@@ -61,7 +61,8 @@ export function SlotRack({
 	const now = useNow(60_000);
 	// Options in price order (Coach, Senior, Head), not the API's slug order.
 	const options = useMemo(() => [...offering.series].sort((a, b) => a.price - b.price), [offering.series]);
-	const [seriesId, setSeriesId] = useState(options[0]?.id ?? '');
+	// A coach deep link (?coach=) opens on the option that coach is in, not always the cheapest.
+	const [seriesId, setSeriesId] = useState(() => (options.find((s) => s.coachIds.some((id) => coaches[id]?.slug === initialCoach)) ?? options[0])?.id ?? '');
 	const series = offering.series.find((s) => s.id === seriesId) ?? offering.series[0]!;
 
 	const coachChoices = useMemo(() => series.coachIds.map((id) => coaches[id]).filter((c): c is RackCoach => Boolean(c)), [series, coaches]);
@@ -83,8 +84,9 @@ export function SlotRack({
 	const { data: ranges, isLoading, error: rangesError } = useSWR<FreeRange[]>(`/api/ranges?${q}`, fetcher, { revalidateOnFocus: false, keepPreviousData: true });
 
 	const starts = useMemo(
-		() => (ranges && now ? startsFrom(ranges, { durationMin: length, stepMin: offering.stepMin, now: now.getTime(), advanceSeconds: series.advanceSeconds, places: 1 }) : []),
-		[ranges, now, length, offering.stepMin, series.advanceSeconds],
+		// While a new coach, site or option loads, `ranges` still holds the previous one's windows: offer nothing until it lands.
+		() => (ranges && now && !isLoading ? startsFrom(ranges, { durationMin: length, stepMin: offering.stepMin, now: now.getTime(), advanceSeconds: series.advanceSeconds, places: 1 }) : []),
+		[ranges, now, isLoading, length, offering.stepMin, series.advanceSeconds],
 	);
 	const byDay = useMemo(() => startsByDay(starts), [starts]);
 	const today = now ? localParts(now.getTime()).date : null;
@@ -242,7 +244,7 @@ export function SlotRack({
 						<>
 							<RackDays
 								days={days}
-								loading={isLoading && !ranges}
+								loading={isLoading}
 								value={day}
 								today={today}
 								onChange={(d) => {

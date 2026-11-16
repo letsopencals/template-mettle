@@ -89,6 +89,17 @@ export function disciplineForSlug(slug: string | null | undefined): string {
 	return classMeta(key)?.discipline ?? serviceMeta(key)?.discipline ?? 'coaching';
 }
 
+/**
+ * The variant title unless it only repeats who and where ("Collingwood · Jo" for a session with Jo at Mettle
+ * Collingwood): classes, events and hires name their variants after the site and the coach.
+ */
+export function distinctVariant(variantTitle: string | null | undefined, ...names: Array<string | null | undefined>): string | null {
+	if (!variantTitle) return null;
+	const known = names.filter(Boolean).join(' ').toLowerCase();
+	const parts = variantTitle.split('·').map((p) => p.trim().toLowerCase()).filter(Boolean);
+	return parts.every((p) => known.includes(p)) ? null : variantTitle;
+}
+
 export function getBookingMeta(appt: AppointmentLike): BookingMeta {
 	const staff = appt.staffMember;
 	const coach = staff ? [staff.firstName, staff.lastName].filter(Boolean).join(' ') || null : null;
@@ -102,7 +113,7 @@ export function getBookingMeta(appt: AppointmentLike): BookingMeta {
 		offeringKey: key,
 		discipline,
 		plate: plateFor(discipline),
-		variant: appt.product?.variantTitle || null,
+		variant: distinctVariant(appt.product?.variantTitle, coach, appt.location?.title),
 		kindLabel: isClass ? 'Class' : discipline === 'events' ? 'Event' : 'Session',
 		people: appt.customAttributes?.[siteConfig.customAttributeKeys.people] === '2' ? 2 : Math.max(1, appt.numberOfAttendees ?? 1),
 		coach,

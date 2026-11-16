@@ -33,6 +33,8 @@ export function OrderDetailView({ id }: { id: string }) {
 			<ul className="mt-6 border-t-2 border-ink">
 				{o.lineItems.map((li) => {
 					const v = li.appointment ? toBookingView(li.appointment) : null;
+					// A cancelled session stays listed but is out of the subtotal and total.
+					const cancelled = li.appointment?.status === 'canceled';
 					return (
 						<li key={li.appointmentId ?? li.createdAt} className="flex items-center gap-3 border-b border-chalk-line py-3">
 							{v ? <Plate plate={v.plate} size="md" /> : null}
@@ -51,7 +53,7 @@ export function OrderDetailView({ id }: { id: string }) {
 									</span>
 								) : null}
 							</span>
-							<span className="mono">{formatPrice(linePrice(li), cur)}</span>
+							<span className={cancelled ? 'mono text-muted' : 'mono'}>{cancelled ? <><s>{formatPrice(linePrice(li), cur)}</s> Cancelled</> : formatPrice(linePrice(li), cur)}</span>
 						</li>
 					);
 				})}

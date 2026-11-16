@@ -21,7 +21,7 @@ export function BarLine({ item, currency, onRemove, removing, tone = 'chalk' }: 
 				<div className="flex items-start justify-between gap-3">
 					<p className="font-semibold leading-tight">
 						{meta.title}
-						{meta.variant && meta.kindLabel !== 'Class' ? <span className={clsx('font-normal', muted)}> · {meta.variant}</span> : null}
+						{meta.variant ? <span className={clsx('font-normal', muted)}> · {meta.variant}</span> : null}
 					</p>
 					<p className="mono shrink-0 text-sm">{formatPrice(linePrice(item), currency)}</p>
 				</div>
