@@ -27,7 +27,7 @@ export function RackDays({ days, value, onChange, today, loading = false }: { da
 					>
 						<span className="index-label opacity-70">{d.date === today ? 'Today' : p.weekday}</span>
 						<span className="display text-3xl leading-none">{p.day}</span>
-						<span className={clsx('mono mt-1 text-[0.62rem]', on ? 'text-chalk/60' : 'text-muted')}>{loading ? '…' : d.count ? `${d.count} ${d.count === 1 ? 'time' : 'times'}` : 'No times'}</span>
+						<span className={clsx('mono mt-1 whitespace-nowrap text-[0.62rem]', on ? 'text-chalk/60' : 'text-muted')}>{loading ? '…' : d.count ? `${d.count} ${d.count === 1 ? 'time' : 'times'}` : 'No times'}</span>
 					</button>
 				);
 			})}

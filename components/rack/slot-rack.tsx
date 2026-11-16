@@ -161,11 +161,15 @@ export function SlotRack({
 		</div>
 	);
 
+	// Steps are lettered in the order shown, so a suite with no option, coach, site or length starts at A.
+	const steps = [offering.series.length > 1 && 'option', coachChoices.length > 1 && 'coach', siteChoices.length > 1 && 'site', lengths.length > 1 && 'length', 'day', (addOns.length || addOnsLoading) && 'extras'].filter(Boolean);
+	const stepLetter = (key: string) => String.fromCharCode(65 + steps.indexOf(key));
+
 	return (
 		<div className="grid gap-8 lg:grid-cols-12">
 			<div className="space-y-6 lg:col-span-8">
 				{offering.series.length > 1 ? (
-					<Step n="A" title="Option">
+					<Step n={stepLetter('option')} title="Option">
 						<Segmented
 							label="Option"
 							value={series.id}
@@ -178,7 +182,7 @@ export function SlotRack({
 					</Step>
 				) : null}
 				{coachChoices.length > 1 ? (
-					<Step n="B" title="Coach">
+					<Step n={stepLetter('coach')} title="Coach">
 						<div role="radiogroup" aria-label="Coach" className="flex flex-wrap gap-1.5">
 							{[null, ...coachChoices].map((c) => {
 								const on = (c?.id ?? ANY) === coachId;
@@ -210,7 +214,7 @@ export function SlotRack({
 				{siteChoices.length > 1 || lengths.length > 1 ? (
 					<div className="grid gap-6 sm:grid-cols-2">
 						{siteChoices.length > 1 ? (
-							<Step n="C" title="Site">
+							<Step n={stepLetter('site')} title="Site">
 								<Segmented
 									label="Site"
 									value={siteId}
@@ -223,7 +227,7 @@ export function SlotRack({
 							</Step>
 						) : null}
 						{lengths.length > 1 ? (
-							<Step n="D" title="Length">
+							<Step n={stepLetter('length')} title="Length">
 								<Segmented
 									label="Length"
 									value={String(length)}
@@ -237,7 +241,7 @@ export function SlotRack({
 						) : null}
 					</div>
 				) : null}
-				<Step n="E" title="Day & time" aside={isLoading ? <span className="mono text-xs text-muted">Loading times…</span> : null}>
+				<Step n={stepLetter('day')} title="Day & time" aside={isLoading ? <span className="mono text-xs text-muted">Loading times…</span> : null}>
 					{rangesError ? <p className="text-sm text-plate-red">Times didn&rsquo;t load. Refresh to try again.</p> : null}
 					{!rangesError && ranges && !firstOpen ? <p className="border border-dashed border-ink/20 px-4 py-6 text-center text-muted">Nothing free in the next three weeks{coach ? ` with ${coach.firstName}. Try any coach.` : '.'}</p> : null}
 					{days.length ? (
@@ -259,7 +263,7 @@ export function SlotRack({
 					)}
 				</Step>
 				{addOns.length || addOnsLoading ? (
-					<Step n="F" title="Extras">
+					<Step n={stepLetter('extras')} title="Extras">
 						<AddOnPicker addOns={addOns} picked={addOnPicks} onChange={setQuantity} currency={currency} loading={addOnsLoading} />
 					</Step>
 				) : null}
