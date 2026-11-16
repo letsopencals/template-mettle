@@ -14,10 +14,10 @@ describe('the Bar', () => {
 	});
 
 	it('tracks progress to the Training Block thresholds', () => {
-		expect(progressFor(0)).toMatchObject({ reached: null, next: { amount: 150 }, toNext: 150 });
-		expect(progressFor(149.5)).toMatchObject({ reached: null, toNext: 0.5 });
-		expect(progressFor(150)).toMatchObject({ reached: { amount: 150, percent: 10 }, next: { amount: 300 }, toNext: 150 });
-		expect(progressFor(320)).toMatchObject({ reached: { amount: 300 }, next: null, toNext: 0 });
+		expect(progressFor(0)).toMatchObject({ reached: null, next: { amount: 100 }, toNext: 100 });
+		expect(progressFor(99.5)).toMatchObject({ reached: null, toNext: 0.5 });
+		expect(progressFor(100)).toMatchObject({ reached: { amount: 100, percent: 10 }, next: { amount: 250 }, toNext: 150 });
+		expect(progressFor(320)).toMatchObject({ reached: { amount: 250 }, next: null, toNext: 0 });
 		expect(barProgress([item('a', 'barbell-club-collingwood-jo', 32), item('b', 'pt-coach', 110)]).loaded).toBe(142);
 	});
 });

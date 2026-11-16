@@ -52,7 +52,7 @@ level, never a plate colour.
   stack order. It's the only divider between slabs.
 - **The Bar** (`components/bar/*`): a barbell in SVG (sleeves, collars, a knurled shaft). Each cart
   item slides a plate onto the sleeve, and the scale under it marks the Training Block thresholds
-  (A$150, A$300) as collars.
+  (A$100, A$250) as collars.
 - **LED readout** (`led.tsx`): Chivo Mono on rubber with a soft glow and a blinking colon, used for
   "Next on the floor" in the header, the countdowns and the hero board.
 - **Bib** (`components/bib/*`): the confirmation artifact. A white bib with four safety pins at the
@@ -124,7 +124,7 @@ level, never a plate colour.
 | Section rhythm | eyebrow → H2 → three-card grids (most); Gable: numbered drawing sheets; Alba: a side chart rail | Full-bleed **rubber/chalk slabs** split by the **calibration strip**, a mono index and a left-aligned display head |
 | Timetable | **Tensile: a week grid of day columns with bed pips and a slide-over class sheet.** VOLT: a hall map. Gable: a search-results planner | **One day, a horizontal time axis, lanes per discipline**; sessions as plate blocks sized by duration; the panel docks *under* the board, not a slide-over |
 | Booking (1:1) | Tensile: privates wizard; Alba: chair-time track; Frisør: 3-step chair panel | The **Slot rack**: segmented options, the day row directly above plain slots, the Bar panel beside them |
-| Upsell | Discount banners | **Loading the bar**: plates rack on, threshold collars at A$150/A$300, Training Blocks |
+| Upsell | Discount banners | **Loading the bar**: plates rack on, threshold collars at A$100/A$250, Training Blocks |
 | Checkout | Step accordion + sticky summary (HAAR, Clarity, Tensile), Day sheet (Gable) | The Bar across the top + three stacked **sets** that collapse to receipts |
 | Confirmation | Tickets, check-in pass (Tensile), flippable card (Alba), Day-sheet printout (Gable) | A **race bib** with safety pins and plate stripes |
 | Account | Ticket next booking, week board (Tensile), Week plan (Gable), recall ring (Alba) | A **Training log** with a ruled log and a plate stack |

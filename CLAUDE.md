@@ -142,7 +142,7 @@ events. Seed dataset `boutique_gym` (backend). Design contract: **DESIGN.md**
   `customAttributes.people = "2"`), then the Bar drawer opens.
 - **The Bar** (`lib/bar.ts`, `components/bar/*`): one plate per cart item
   coloured by discipline; the scale shows `siteConfig.blockThresholds`
-  (A$150 → 10%, A$300 → 15%: the store's automatic minimum-purchase
+  (A$100 → 10%, A$250 → 15%: the store's automatic minimum-purchase
   discounts). **The total and each offer come from the cart**; thresholds only
   drive the "Add $12 more for Loaded" copy. The API's `subtotal` (cart and order)
   is already net of offers, so the "Sessions & extras" gross is rebuilt from the

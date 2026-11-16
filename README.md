@@ -87,9 +87,9 @@ The summary with the live price and **Load the bar** sits beside the slots on de
 
 ### The Bar and Training Blocks
 
-The cart is a **barbell**. Every session you book racks a plate in its discipline's colour, and the scale under the bar marks the **Training Block thresholds**: load A$150 in one order for 10% off, A$300 for 15%. These are real automatic minimum-purchase discounts in the store, and the totals always come from the cart. **`/blocks`** has four curated blocks (Fight Week, Strong Start, Engine Block, Recovery Ritual). You fill each line from the Floor or the rack, then book the whole block in one order.
+The cart is a **barbell**. Every session you book racks a plate in its discipline's colour, and the scale under the bar marks the **Training Block thresholds**: load A$100 in one order for 10% off, A$250 for 15%. These are real automatic minimum-purchase discounts in the store, and the totals always come from the cart. **`/blocks`** has four curated blocks (Fight Week, Strong Start, Engine Block, Recovery Ritual). You fill each line from the Floor or the rack, then book the whole block in one order.
 
-![The Bar — three classes racked as plates, the A$150 and A$300 thresholds, and the first-order offer](docs/bar.png)
+![The Bar — three classes racked as plates, the A$100 and A$250 thresholds, and the first-order offer](docs/bar.png)
 
 ![Training Blocks — Fight Week, Strong Start, Engine Block and Recovery Ritual, filled from the Floor](docs/blocks.png)
 

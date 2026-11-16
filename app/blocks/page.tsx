@@ -12,7 +12,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
 	title: 'Training Blocks',
-	description: 'Book a week of METTLE sessions in one go. Load A$150 on the bar for 10% off, A$300 for 15%.',
+	description: 'Book a week of METTLE sessions in one go. Load A$100 on the bar for 10% off, A$250 for 15%.',
 };
 
 export default async function BlocksPage() {

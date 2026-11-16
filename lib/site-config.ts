@@ -657,8 +657,8 @@ export const siteConfig = {
 	 * are always the truth; these only drive the progress copy.
 	 */
 	blockThresholds: [
-		{ amount: 150, percent: 10, label: 'Loaded' },
-		{ amount: 300, percent: 15, label: 'Heavy' },
+		{ amount: 100, percent: 10, label: 'Loaded' },
+		{ amount: 250, percent: 15, label: 'Heavy' },
 	],
 
 	/** Curated Training Blocks: bundles booked in one order so the threshold discount applies. */
