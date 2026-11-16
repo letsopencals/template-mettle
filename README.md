@@ -107,6 +107,8 @@ The cart is a **barbell**. Every session you book racks a plate in its disciplin
   - a stack of plates for every finished session, by discipline;
   - every session written up week by week.
 
+  Orders and settings sit alongside it.
+
 ![Checkout — the Bar across the top, then You, Clearance and Pay](docs/checkout.png)
 
 ![The race bib — booking 4127 for Mia Kovač, the heat sheet with calendar links, what to bring and getting there](docs/thank-you.png)
@@ -118,8 +120,6 @@ The cart is a **barbell**. Every session you book racks a plate in its disciplin
   <img src="docs/mobile-thank-you.png" width="260" alt="The race bib on a phone" />
   <img src="docs/mobile-home.png" width="260" alt="The homepage on a phone" />
 </p>
-
-  Orders and settings sit alongside it.
 
 ### Coaches, Sites, Disciplines, Events, Memberships
 
