@@ -125,7 +125,7 @@ export function SessionPanel({
 								<span className="mono block text-sm">
 									{longDayLabel(next.start)} · {next.localTime}
 								</span>
-								<span className="text-xs text-chalk/60">{next.seatsLeft} places left →</span>
+								<span className="text-xs text-chalk/60">{next.seatsLeft} {next.seatsLeft === 1 ? 'place' : 'places'} left →</span>
 							</button>
 						) : (
 							<p className="mt-2 text-sm text-chalk/60">Nothing in the next four weeks. Try another class.</p>

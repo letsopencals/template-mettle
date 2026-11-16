@@ -35,7 +35,7 @@ export const SessionBlock = memo(function SessionBlock({
 			type="button"
 			onClick={() => onSelect(o)}
 			aria-pressed={selected}
-			aria-label={`${o.short}, ${o.localTime}, ${o.minutes} minutes${coach ? `, with ${coach}` : ''}${site ? `, ${site}` : ''}, ${full ? 'full' : `${o.seatsLeft} places left`}`}
+			aria-label={`${o.short}, ${o.localTime}, ${o.minutes} minutes${coach ? `, with ${coach}` : ''}${site ? `, ${site}` : ''}, ${full ? 'full' : `${o.seatsLeft} ${o.seatsLeft === 1 ? 'place' : 'places'} left`}`}
 			style={{ ...style, ...(full ? {} : { backgroundColor: plate.hex, color: plate.ink }) }}
 			className={clsx(
 				'group overflow-hidden rounded-[2px] text-left transition-[transform,box-shadow] duration-150',

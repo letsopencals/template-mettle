@@ -49,7 +49,15 @@ export function ThankYouView({ orderId }: { orderId: string | null }) {
 	useEffect(() => setInstructions(loadPaymentInstructions(orderId)), [orderId]);
 
 	if (status === 'loading' || isLoading) {
-		return <div className="rubber-texture min-h-[70vh]" aria-busy="true" />;
+		return (
+			<section className="rubber-texture min-h-[70vh] text-chalk" aria-busy="true" aria-label="Loading your booking">
+				<div className="container-x py-16">
+					<p className="mono text-[0.72rem] uppercase tracking-[0.2em] text-chalk/60">Booked · printing your bib</p>
+					<div className="mt-6 h-24 w-2/3 max-w-xl animate-pulse bg-chalk/10" />
+					<div className="mt-8 h-56 max-w-md animate-pulse bg-chalk/10" />
+				</div>
+			</section>
+		);
 	}
 	if (status !== 'authenticated') {
 		const back = orderId ? `/thank-you?orderId=${encodeURIComponent(orderId)}` : '/account';
