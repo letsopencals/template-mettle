@@ -72,7 +72,7 @@ export function AppointmentDetail({ id, initialAction }: { id: string; initialAc
 						<PlateTag plate={v.plate}>{v.kindLabel}</PlateTag>
 						<h1 className="display mt-1 text-5xl leading-none">{v.title}</h1>
 						<p className="mt-2 text-ink-2">{longDayLabel(v.start)}</p>
-						<p className="text-sm text-muted">{[v.variant, v.coach ? `with ${v.coach}` : null, v.isOnline ? 'Mettle Remote' : v.locationTitle, v.people > 1 ? `${v.people} people` : null].filter(Boolean).join(' · ')}</p>
+						<p className="text-sm text-muted">{[v.kindLabel === 'Class' ? null : v.variant, v.coach ? `with ${v.coach}` : null, v.isOnline ? 'Mettle Remote' : v.locationTitle, v.people > 1 ? `${v.people} people` : null].filter(Boolean).join(' · ')}</p>
 						{v.address ? <p className="text-sm text-muted">{v.address}</p> : null}
 						{v.status === 'canceled' ? <p className="mono mt-2 text-sm text-plate-red">CANCELLED</p> : v.awaiting ? <p className="mono mt-2 text-sm text-plate-red">{AWAITING_TAG[v.awaiting]}</p> : null}
 					</div>
