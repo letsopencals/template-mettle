@@ -165,7 +165,7 @@ export function BlockBuilder({ block, classes, services, siteNames }: { block: T
 					<BarNudge progress={progress} currency={currency} tone="rubber" />
 					<div className="mt-4 flex items-baseline justify-between border-t border-chalk/15 pt-3">
 						<span className="text-sm text-chalk/60">Before offers</span>
-						<span className="display text-4xl">{formatPrice(total, currency)}</span>
+						<span className="display text-4xl">{picks.length ? formatPrice(total, currency) : "—"}</span>
 					</div>
 					<p className="mt-1 text-xs text-chalk/50">The bar shows the final price: each session gets its biggest offer (first order, Midday shift or the block).</p>
 					<Button variant="plate" size="lg" fullWidth className="mt-4" disabled={!complete} loading={pending} onClick={() => void load(picks.slice().sort((a, b) => a.start - b.start).map((p) => p.request))}>
