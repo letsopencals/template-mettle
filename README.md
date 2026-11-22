@@ -211,6 +211,7 @@ Checks: `npm run typecheck`, `npm run lint` and `npm test`. The tests cover the 
 | [Alba Dental](https://github.com/letsopencals/template-alba) | Dental clinic | [template-alba.vercel.app](https://template-alba.vercel.app) |
 | [Gable](https://github.com/letsopencals/template-gable) | Coworking | [template-gable.vercel.app](https://template-gable.vercel.app) |
 | [Afterglow](https://github.com/letsopencals/template-afterglow) | Content gym | [template-afterglow.vercel.app](https://template-afterglow.vercel.app) |
+| [Otherdoor](https://github.com/letsopencals/template-otherdoor) | Escape rooms | [template-otherdoor.vercel.app](https://template-otherdoor.vercel.app) |
 
 ---
 
